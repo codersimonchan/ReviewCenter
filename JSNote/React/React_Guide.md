@@ -319,7 +319,7 @@ When updating your state based on the previous value of that state, you should p
 
 # Update object Immutably
 
-"Immutably" 是 "immutable"（不可变的）一词的副词形式。在编程领域，不可变性是指一旦创建了一个对象，就无法更改其内容或状态。相反，任何修改操作都将返回一个新的对象，而不是直接修改原始对象。
+"Immutably" 是 "immutable"（不可变的）一词的副词形式。在编程领域，不可变性是指一旦创建了一个对象，就不要更改其内容或状态。相反，任何修改操作都将返回一个新的对象，而不是直接修改原始对象。
 
 In an immutable way, which simply means you create a copy of the old state, so a new object or a new array first. and then you just change that copy instead of that existing object or array. And the reason for that recommendation is that if your state is an object or array, you are dealing with a reference value in JavaScript. And therefore if you update an object or array directly.  You would be updating the old value in-memory immediately. And this can again lead to strange bugs or side  effects if you have multiple places in your application that are using that object or array.
 
@@ -414,13 +414,13 @@ Therefore simply is that as a React developer, you should always look for opport
 
 # Refs
 
-组件内的标签可以定义ref属性来表示自己，或者叫reference变量关联自己，和原生里面的id很是类似。而不必通过像在传统的 JavaScript 中一样使用 `document.getElementById`才可以获取关联到一个元素。
+组件内的标签可以定义ref属性来标识自己，或者叫reference变量关联自己，和原生里面的id很是类似。而不必通过像在传统的 JavaScript 中一样使用 `document.getElementById`才可以获取关联到一个元素。
 
 If we have some inputs in a form, usually we manage what the user enters by simply keeping track of it with the state. with every keystroke, we update our state. so with every keystroke, we update the value we get by the user and we store it in our state. That is a  perfectly fine way of managing this.
 
 But updating a state with every keystroke(按键)， when we only need it when we submit the form, sounds a bit redundant to me, that is a scenario where refs could help us, though they are not limited to that.
 
-ref 也是react组件的一个属性，像key属性一样，是一个特殊的属性。这个属性接收一个ref的值作为输入，这样这个输入组件在最后连接到这个ref值。这样
+ref 也是react组件的一个属性，像key属性一样，是一个特殊的属性。这个属性接收一个ref的值作为输入，这样这个输入组件在最后连接到这个ref值。
 
 ```
 import React, { useRef } from 'react';
@@ -447,7 +447,7 @@ export default MyComponent;
 
 ```
 
-使用refs，我们可以在最终呈现的HTML元素和其他的JS代码之间建立连接
+使用refs，我们可以在最终呈现的HTML元素和其他的JS代码之间建立连接。
 
 Like all React hooks,  useRef is only usable inside of functional components. **what does useRef return and what value does it take**?
 
@@ -540,63 +540,55 @@ export default App;
 
 # Side Effects
 
-Side effects are tasks that don't impact the current component render cycle but need to be executed in your app in the some time, such as some callback function. So whenever you have a task that must be performed but that does not directly and instantly impact the current component render cycle, that could be called side effects.
-
-
-
-if update the state in an async function, once state updated, function component will be re-executed again,  and then async function would be re-executed again after component executed, and then state is updated, and then function component, which result in the infinite loop.
+if update the state in an async function in a component, once state updated, function component will be re-executed again,  and then async  function would be re-executed again after component executed, and then state is updated, and then function component, which result in the infinite loop. 
 
 we would use effect to solve infinite loop. use effect needs two arguments, and the first argument is a function(usually is a anonymous function) that should warp your side effect code, and the second argument is an array of dependencies of that effect function.
 
-
-
-Because the idea behind useEffect is that this function which you pass as a first argument to useEffect will be executed by React after every component execution. If the second argument is an empty array , the effect function would only execute once. if you define the dependencies array,then React will actually take a look at the dependencies specified there, and it will only execute this effect function again if the dependency values changed. If you omit the array, will cause an infinite loop.
+Because the idea behind useEffect is that this function which you pass as a first argument to useEffect **will be executed by React after every component execution**. If the second argument is an empty array , the effect function would only execute once. if you define the dependencies array,then React will actually take a look at the dependencies specified there, and it will only execute this effect function again if the dependency values changed. If you omit the array, will cause an infinite loop.
 
 ```
 import React, { useState, useEffect } from 'react';
 
-const MyComponent = () => {
-  const [data, setData] = useState([]);
+function Example() {
+  const [count, setCount] = useState(0);
 
+  // 声明一个 effect
   useEffect(() => {
-    // 模拟异步数据获取
-    const fetchData = async () => {
-      try {
-        // 这里可以使用实际的数据获取方法，比如 fetch、axios 等
-        const response = await fetch('https://api.example.com/data');
-        const result = await response.json();
-        setData(result);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+    // 在组件渲染完成后执行
+    document.title = `You clicked ${count} times`;
 
-    // 调用数据获取函数
-    fetchData();
-
-    // 注意：在此处可以返回一个清理函数，用于清理 effect 所产生的副作用
-    // 例如，取消订阅、清除定时器等
+    // 返回一个清理函数，用于组件卸载时执行清理操作
     return () => {
-      // 清理代码
+      document.title = 'React App'; // 恢复原始的文档标题
     };
-  }, []); // 传递空数组作为第二个参数表示仅在组件挂载和卸载时执行一次
+  }, [count]); // 仅在 count 发生变化时重新执行
 
   return (
     <div>
-      <h1>My Data:</h1>
-      <ul>
-        {data.map((item, index) => (
-          <li key={index}>{item}</li>
-        ))}
-      </ul>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
     </div>
   );
-};
+}
 
-export default MyComponent;
+export default Example;
 ```
 
+在这个示例中，我们使用 `useEffect` 来更新文档标题。当组件渲染完成后，`useEffect` 中的 effect 函数会执行，将文档标题设置为当前点击次数。另外，我们传递了一个依赖数组 `[count]`，这意味着 effect 函数仅在 `count` 发生变化时才会重新执行。
 
+当 React 完成对组件的渲染时，会调用 `useEffect` 中的副作用函数。
+
+如果提供了依赖数组，并且其中的依赖项发生了变化，那么 React 会先调用副作用函数的清理函数，然后再调用新的副作用函数。
+
+异步操作是副作用的一种常见形式，因为它们通常不会立即返回结果，而是在一段时间后返回结果。这包括网络请求、定时器、事件监听器等。异步操作的结果可能会影响应用程序的状态或行为，因此它们被视为副作用。
+
+除了异步操作之外，还有许多其他类型的副作用，例如：
+
+1. 修改全局状态（例如 Redux 或 Context API 中的状态）。
+2. 订阅外部事件（例如 DOM 事件、WebSocket 事件等）。
+3. 执行 DOM 操作（例如添加或删除元素、修改样式等）。
+4. 读写本地存储或浏览器缓存。
+5. 向服务器发送数据（例如表单提交、WebSocket 消息等）。
 
 # Context Feature
 

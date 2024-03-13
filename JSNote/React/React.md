@@ -227,6 +227,46 @@ class Button extends React. Component {
 
 ![Understand How Rendering Works in React](https://d585tldpucybw.cloudfront.net/sfimages/default-source/blogs/2022/2022-10/re-rendering-process.png?sfvrsn=637f6f_3)
 
+## 4.5 Module.exports
+
+- 当我们require某个模块时，并不是只拿他的module.exports，而是会从头开始运行这个文件。只是只有在module.exports对象上的属性和方法，才可以被外部访问和使用。
+
+-  每个自定义模块中都有一个module对象，存储了和当前模块有关的信息。其有exports对象属性，可以直接调用exports属性，将本模块方法共享出去。
+
+- 在自定义的模块中，可以使用module.exports对象，将模块内的成员共享出去，供外界使用。外界用require()方法导入自定义模块时，得到的就是module.exports所指向的对象。那么module.exports对象上的属性和方法，就可以任意使用。
+
+- 由于默认情况下，module.exports对象单词写起来比较复杂，为了简化向外共享成员的代码，node提供了exports对象，exports和module.exports指向的是同一个对象，所以使用exports挂载和module.exports挂载结果是一样的。
+
+
+- 使用 export 关键字可以导出模块中的多个变量、函数、类等，导进的内容和导出的内容需要使用相应的名称进行引用，使用 {} 包裹。
+
+  ```
+  // 导出变量和函数
+  export const myVariable = 10;
+  export function myFunction() {
+    return 'Hello';
+  }
+  
+  // 引入导出的内容并使用别名
+  import {  myVariable as customVariable, myFunction as customFunction } from './module';
+  ```
+
+- 使用 export default 导出的内容, 在import引用时可以使用任意名称引用，并且不需要使用 {} 包裹。语句用于导出模块的默认值，一个模块中只能有一个默认导出。
+
+  ```
+  // 导出默认值
+  const myDefault = {
+    name: 'John',
+    age: 30
+  };
+  export default myDefault;
+  
+  // 导入默认值并使用不同的名称引用
+  import customDefault from './module';
+  ```
+
+  在同一个模块中，可以同时使用 `export default` 和 `export` 导出多个内容。`export default` 用于导出模块的默认值，而 `export` 用于导出具体的变量、函数、类等。
+
 # 5 React面向组件编程
 
 ## 5.1 基本理解和使用
@@ -453,7 +493,7 @@ class Button extends React. Component {
 
 卸载：unmount。同时，当 DOM 中  组件被删除的时候，应该[清除计时器](https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/clearInterval)。这在 React 中被称为“卸载（unmount）”
 
-
+生命周期回调函数，也叫生命周期钩子函数，即react会在合适的时间点，在组件挂载结束的时候，将生命周期函数钩出来执行一下。
 
 ### 5.5.3 理解
 
