@@ -766,8 +766,19 @@ https://testerhome.com/articles/33470
 # WorkFlow
 
 - [ ] 首先拉取从远程仓库拉取dev分支到本地仓库，这样本地仓库的dev分支就是最新的内容。
+
 - [ ] 然后依赖dev分支，创建新的feature分支。在feature分支上进行feature的开发。
+
 - [ ] 如果feature开发完毕，在本地运行没有任何问题，直接将feature分支push到远程仓库，并生成远程仓库的feature分支。
+
+  >1，此时可以看到落后dev几个版本，Sync now的时候，会提示我们使用git 命令将远程的dev合并到本地的feature分支
+  >
+  >2，合并的时候如果有冲突，在本地的feature分支里面，就可以看到冲突的地方，看看保留哪些内容，将新的内容整理好后再次commit
+  >
+  >3，然后再将本地的feature分支推送到远程，然后在远程仓库中将，将feature分支合并到dev分支。
+
 - [ ] 然后在远程仓库中，将feature分支合并到dev分支，这样在线dev环境中，可以查看新增的功能。
+
 - [ ] 如果在线dev环境没有任何问题，那么可以将远程dev的分支合并到远程master分支，并进行发布。
+
 - [ ] 在本地的dev分支，再次拉取远程dev到本地分支。

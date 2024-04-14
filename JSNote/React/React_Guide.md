@@ -164,7 +164,7 @@ React performs a process called "reconciliation" (对账) where it compares the 
 Eventually, React translates the processed JSX into actual HTML elements and updates the real DOM to reflect those changes, resulting in the  updated user interface being displayed in the browser.
 
 ```
-function Header() {
+export default function Header() {
   return (
     <header id="main-header">
       <div id="title">
@@ -200,7 +200,22 @@ import image into JavaScript file is not something you can normally do in JavaSc
 
 ## Making components reusable  with Props
 
-如果一个组件我们想重复使用四次，但是每次使用的时候，应该填充不同的数据。React allows you to pass data to component via a concept called "Props", Therefore, React will pass a value for this props parameter to this function when it calls it. 所以在创建组件的时候，会携带一个参数，这个参数就是Props属性，Props是一个拥有键值对的对象。
+如果一个组件我们想重复使用四次，但是每次使用的时候，应该填充不同的数据。React allows you to pass data to component via a concept called "Props", Therefore, React will pass a value for this props parameter to this function when it calls it. 所以在创建组件的时候，会携带一个参数，这个参数就是Props属性，Props是一个拥有键值对的对象。收集所有该组件的属性。
+
+```
+function Greeting(person) {
+  return <h1>Hello, {person.name}! You are {person.age} years old.</h1>;
+}
+
+const element = <Greeting name="John" age={30} />;
+
+解构赋值，此时的name也可以是一个对象，不一定是一个字符串变量
+function Greeting({ name, age }) {
+  return <h1>Hello, {name}! You are {age} years old.</h1>;
+}
+const element = <Greeting name="John" age={30} />;
+
+```
 
 ![image-20231101115046617](C:\Users\simon.cheng\AppData\Roaming\Typora\typora-user-images\image-20231101115046617.png)
 
@@ -212,7 +227,7 @@ import image into JavaScript file is not something you can normally do in JavaSc
 
 ## The special children Prop
 
-Children is a prop that is not set with help of component attributes like others(title,description above just like a html attribute when rendered) . Instead this children prop here simply refers to the **content** **between your component** tags. so we don't set children like that. 
+Children is a prop that is not set with help of component attributes like others(title,description above just like a html attribute when rendered) . Instead this children prop here simply refers to the **content** **between your component** tags. so we don't set children like that.  组件中间的内容，就是组件的children属性。
 
 **非自闭合标签：**
 
@@ -246,9 +261,9 @@ function handleClickWithParameter(param) {
 }
 
 // 使用箭头函数传递参数
-<button onClick={() => handleClickWithParameter("CustomParam")}>Click me</button>
+<button onClick={() => handleClickWithParameter("CustomParam");}>Click me</button>
 
-// 或者使用闭包传递参数
+// 或者使用闭包传递参数, 在函数当中调用函数
 <button onClick={function() { handleClickWithParameter("CustomParam"); }}>Click me</button>
 ```
 
@@ -321,7 +336,7 @@ When updating your state based on the previous value of that state, you should p
 
 "Immutably" 是 "immutable"（不可变的）一词的副词形式。在编程领域，不可变性是指一旦创建了一个对象，就不要更改其内容或状态。相反，任何修改操作都将返回一个新的对象，而不是直接修改原始对象。
 
-In an immutable way, which simply means you create a copy of the old state, so a new object or a new array first. and then you just change that copy instead of that existing object or array. And the reason for that recommendation is that if your state is an object or array, you are dealing with a reference value in JavaScript. And therefore if you update an object or array directly.  You would be updating the old value in-memory immediately. And this can again lead to strange bugs or side  effects if you have multiple places in your application that are using that object or array.
+In an immutable way, which simply means you create a copy of the old state object, so a new object or a new array first. and then you just change that copy instead of that existing object or array. And the reason for that recommendation is that if your state is an object or array, you are dealing with a reference value in JavaScript. And therefore if you update an object or array directly.  You would be updating the old value in-memory immediately. And this can again lead to strange bugs or side  effects if you have multiple places in your application that are using that object or array.
 
 利用展开运算符，创建新的对象，是一种shallow copy, 创建了一个新的对象。对于浅拷贝后的对象来说，在第一层级上，新创建的对象与原始对象是独立的，但对于嵌套对象或数组等引用类型的属性，它们还是会共享相同的引用地址。
 
@@ -342,8 +357,6 @@ shallowCopy.nestedObj.b = 10;
 
 console.log(originalObject.a); // 输出 1，原始对象的属性不受影响
 console.log(originalObject.nestedObj.b); // 输出 10，原始对象的嵌套对象属性受到影响
-
-
 ```
 
 ```
@@ -354,41 +367,29 @@ console.log(removed); // 输出: [2, 3] 被删除的元素
 
 ```
 
-如果直接修改了状态，而没有创建新的状态对象，React  就难以判断什么时候进行重新渲染。React在比较状态变化时，通常会比较对象的引用（即内存地址），而不是对象的内容。如果状态对象的引用没有变化，React 可能会认为状态没有发生变化，从而不触发重新渲染。
+如果直接修改了状态，而没有创建新的状态对象，React  就难以判断什么时候进行重新渲染。React在比较状态变化时，通常会比较对象的引用（即内存地址），而不是对象的内容。如果状态对象的引用没有变化，React 可能会认为状态没有发生变化，从而不触发重新渲染。如果对象的引用发生了变化，那么React就会认为state发生了变化，从而触发重新渲染。
 
 ![image-20231103223426480](C:\Users\simon.cheng\AppData\Roaming\Typora\typora-user-images\image-20231103223426480.png)
 
 综上：如果更新状态的时候，逻辑复杂，需要进行判断的时候，我们可以使用回到函数，然后将修改好的内容添加到一个新的对象当中
 
-```
-  const handleHeaderClick = (clickedHeader) => {
-    if (filterParams.sort_by === clickedHeader) {
-      setFilterParams((prevFilterParams)=>{
-        let newSortOrder, newSortHeader;
-        if (prevFilterParams.sort_order === "") {
-          newSortOrder = "asc";
-          newSortHeader = clickedHeader;
-        } else {
-          newSortOrder = "";
-          newSortHeader = "";
-        }
-        return  { ...filterParams, sort_order: newSortOrder, sort_by: newSortHeader }
-      })
-    } else {
-      setFilterParams({ ...filterParams, sort_order: 'asc', sort_by: clickedHeader });
-    }
-  };
-```
-
 ## Lifting State Up
 
-The app component can pass the information which player is active to both player component and game broad component via props.
+父组件可以通过props给子组件传递信息，例如父组件通过子组件的props属性传递一个会改变状态的函数过去，那么在子组件当中，我们可以通过这个函数改变状态，从而触发父组件的更新。
 
-Should review this again. Ancestor passes the state value **via props** to the child component.
+```
+      <AnimatePresence>
+          {sideVariationVisible && (
+            <SideNewVariation//子组件
+              setFilterParams={setFilterParams}//在父组件中调用了子组件，并传递了setFilterParams函数作为属性给子组件
+            />
+          )}
+        </AnimatePresence>
+```
 
 ![image-20231106091415932](C:\Users\simon.cheng\AppData\Roaming\Typora\typora-user-images\image-20231106091415932.png)
 
-## Vanilla CSS: Advantages & Disadvantages.
+## Vanilla CSS（原生的）: Advantages & Disadvantages.
 
 ![image-20231111151952833](C:\Users\simon.cheng\AppData\Roaming\Typora\typora-user-images\image-20231111151952833.png)
 
@@ -540,7 +541,7 @@ export default App;
 
 # Side Effects
 
-if update the state in an async function in a component, once state updated, function component will be re-executed again,  and then async  function would be re-executed again after component executed, and then state is updated, and then function component, which result in the infinite loop. 
+If update the state in an async function in a component, once state updated, function component will be re-executed again,  and then async  function would be re-executed again after component executed, and then state is updated, and then function component, which result in the infinite loop. 
 
 we would use effect to solve infinite loop. use effect needs two arguments, and the first argument is a function(usually is a anonymous function) that should warp your side effect code, and the second argument is an array of dependencies of that effect function.
 
@@ -578,9 +579,9 @@ export default Example;
 
 当 React 完成对组件的渲染时，会调用 `useEffect` 中的副作用函数。
 
-如果提供了依赖数组，并且其中的依赖项发生了变化，那么 React 会先调用副作用函数的清理函数，然后再调用新的副作用函数。
+如果提供了依赖数组，并且其中的依赖项发生了变化，那么 React 会先调用副作用函数的清理函数，然后再调用新的副作用函数。执行清理函数之后再执行新的副作用函数的主要目的是确保新的副作用函数执行时处于一个干净的状态。如果不执行清理函数，而是直接执行新的副作用函数，可能会导致之前的副作用产生的一些未清理的状态或资源泄露影响到新的副作用函数的正确执行，例如取消订阅、清除定时器、清除副作用产生的临时数据等。这样可以避免出现未经处理的副作用，从而提高了应用的健壮性。
 
-异步操作是副作用的一种常见形式，因为它们通常不会立即返回结果，而是在一段时间后返回结果。这包括网络请求、定时器、事件监听器等。异步操作的结果可能会影响应用程序的状态或行为，因此它们被视为副作用。
+异步操作是副作用的一种常见形式，因为它们通常不会立即返回结果，而是在一段时间后返回结果。这包括网络请求、定时器、事件监听器等。异步操作的结果可能会影响App的状态或行为，因此它们被视为副作用。
 
 除了异步操作之外，还有许多其他类型的副作用，例如：
 
@@ -590,29 +591,57 @@ export default Example;
 4. 读写本地存储或浏览器缓存。
 5. 向服务器发送数据（例如表单提交、WebSocket 消息等）。
 
-# Context Feature
+# Context API
 
-1. Commonly create a  store folder under src for context management, this is just a convention, because we can think it as state store for the entire application, ，and then create a file called a component name under this folder as you like, such as CartContext.jsx.
-2. The Context feature offered by React in the end allows us to spread data into all the components that need it in a very easy and reusable way.(我们想一个component当中的数据，也 会在其他的component里面也要使用，可以将其放在app component当中，可是如果将其放在app 总的component当中，这样就会让app component 越来越庞大。所以这个时候就要使用 react context feature). 
-3. but it is just about spreading data to components, not about changing any values and triggering any component updates.但如果我们在上下文provider里面，包含着触发状态更新的动作，并且何种动作对应如何更新状态。那么这样我们就可以将状态更新也进行传递，传递到其他的components当中。同时我们也可以利用reducer去更新状态。
-4. We typically also want to define contextProvider component which then can be wrapped around our components to make above context defined is available to them. and will do the actual data management and state management.
-5. use chindlren prop to wrap our custom component 
-6. now we can start adding some logic to this component function here some state logic
+如果一些数据，不仅仅是在单个组件里面需要的数据，在其他一些组件当中也需要用到的话，那就要在一个很高级别的父组件中进行管理，这也叫 lifting state up，比如app组件，因为该组件可以通过调用其他组件的属性传递共享数据。当然我们可以在app组件里管理上下文，但意味着我们会写很多code在app组件当中，这通常不是我们想看到的，因此我们通常使用上下文特性以更通用的集中方式管理。
+
+上下文特性允许我们以一种可重用的方式，将数据传播到所有需要它的组件当中。
+
+1. Commonly create a  store folder under src for context management, this is just a convention, because we can think it as state store for the entire application ，and then create a file called a component name under this folder as you like, such as CartContext.jsx.
+2. The Context feature offered by React in the end allows us to spread data into all the components that need it in a very easy and reusable way. 
+3. but it is just about spreading data to components, not about changing any values and triggering any component updates. 当然传播的数据可以是有状态的，因此应该由context provider component来管理不断变化的数据。 所以如果我们在上下文provider里面，包含着触发状态更新的动作，并且何种动作对应如何更新状态。那么这样我们就可以将状态更新也进行传递，传递到其他的components当中。
+4. 使用createContext创建的上下文是一个对象，具有provider属性。这个provider属性是一个可以输出的component，并且其component中间应包含需要访问此上下文的所有其他组件，这样创建的这个上下文就可以应用在其他的组件当中了。
+5. use children prop to wrap our custom component，我们通常使用children属性去包裹那些需要访问此上下文的组件。
+6. 现在我们就可以在CartContextProvider的component里面添加一些逻辑，去控制state的更新。
 
 ```
 import { createContext } from 'react';
 
-//create such a new context object, and has a  provider property, which is actually a component
+//CartContext 实际上是一个包含React组件的对象， 所以C开头大写
+//createContext里面对象（数字，字符串，对象，数组）被用作初始值，提供给React中有被这个上下文包含的所有组件
+//设置了默认值，程序在输入CartContext会更好的自动完成，设置这个默认上下文值使开发人员的生活更轻松
 const CartContext = createContext({
     items: [],
     addItem: (item) => {},
     removeItem: (id) => {},
 });
 
-//
+function cartReducer(state,action) {}
+
 export function CartContextProvider({ children }){
-    return <CartContext.Provider>{children}</CartContext.Provider>
+	//第一个参数是state，第二个参数是分派触发函数，然后会产生一个新的状态。使用减速器reducer，并为状态设置初始值
+	//因为如果状态还没有被更新，这个初始值将被使用
+    const [cartState, dispatchCartAction] = userReducer(cartReducer, { items:[] });
+    
+    //以下，从userReducer获取dispatchCartAction函数，并使用这个函数调用动作，然后cartReducer的action就会执行这个动作，{ type: 'ADD_ITEM', item }就是我们传递给action参数的值。
+    function addItem(Item) {
+    	dispatchCartAction({ type: 'ADD_ITEM', item });
+    }
+    
+    function removeItem(Item) {
+    	dispatchCartAction({ type: 'REMOVE_ITEM', id });
+    }
+
+	const cartContext = {
+		items: cart.items,
+		addItem,
+		removeItem
+	}
+//使用createContext创建的上下文是一个具有provider属性的对象，这个provider属性是一个可以输出的组件，并且其中间应包含需要访问此上下文的所有组件，这样创建的这个上下文就可以应用在其他的组件当中。
+//必须响购物车上下文provider添加一个value属性
+    return <CartContext.Provider value={cartContext}>{children}</CartContext.Provider>
 }
+
 //both CartContextProvider and CartContext will be exported by belowing
 export default CartContext;
 ```
@@ -633,16 +662,61 @@ function App() {
 }
 ```
 
-# userReducer 
+# useReducer 
 
-### 见example
+### 见example，使用state减法器
 
-1. useReducer hook, which also provided by react which allows us to manage more complex state. and also make it easier to move that state management logic out.
-2. useReducer hook needs a reducer function as an input
-3. the goal of this reducer function is to return a updated state object and action object, and this action object that will tell this function how to update this state
-4. it is quite common to receive an object as a value for action, the object also has a ' type ' property.
-5. and the idea simply is that we can take a look at this type ,which is part of the incoming action and then run different code for different action types
-6. In the component function when we call useReducer that define how the state should be look like. because you use useReducer by passing your reducer function as a first parameter, you are not calling it, instead you are just passing a pointer at this function to useReducer, and then we pass the initial state value. so the state that should be assumed when this component renders for the first time.
+如果我们在上下文中，管理要分享出去的state，以及state更新函数，是一个很复杂的事情。这样导致上下文组件函数有点难以阅读。我们可以使用React提供的另一个状态管理的钩子useReducer ，而不是使用useState管理状态。
+
+1. A function that reduce one or more complex values to a simpler one. 比如通过将[5,10,100]这些数字相加，将一个数字数组减少为一个数字。以达到状态的管理目的。
+
+2. useReducer hook, which also provided by react which allows us to manage more complex state. and also make it easier to move that state management logic out.
+
+3. useReducer hook needs a reducer function as an input.
+
+4. the goal of this reducer function is to return a updated state object and action object, and this action object that will tell this function how to update this state。
+
+5. it is quite common to receive an object as a value for action, the object also has a ' type ' property.
+
+6. and the idea simply is that we can take a look at this type ,which is part of the incoming action and then run different code for different action types
+
+7. In the component function when we call useReducer that define how the state should be look like. because you use useReducer by passing your reducer function as a first parameter, you are not calling it, instead you are just passing a pointer at this function to useReducer, and then we pass the initial state value. so the state that should be assumed when this component renders for the first time.
+
+   ```
+   //一个状态参数，一个动作参数
+   function cartReducer(state,action) {
+   // 处理不同的操作，用来更新不同的状态
+     if(action.type === 'ADD_ITEM') {
+     	//...update the state do add a meal item
+     	const existingCartItemIndex = state.items.findIndex({
+     		(item) => item.id === action.item.id
+     	});
+     	   updatedItems == [...state.items];
+     	if(existingCartItemIndex > -1){//-1表示没有找到,创建新的，不可以push到数组，要shallow copy
+     	    const exsitingItem = state.items[existingCartItemIndex]
+     		const updatedItem = {
+     			...exsitingItem,
+     			quantity: exsitingItem.quantity + 1
+     		}
+     		updatedItems[existingCartItemIndex] = updatedItem
+     		以上也是我们以不可变的方式更新这个状态，所以不需要改变内存中的状态
+     	}else{
+     	    updatedItems.push( {...action.item, quantity:1 })
+     	   //添加item的时候，创建一个新的对象。
+     	}
+       return {...state, items: updatedItems};
+     }
+     if(action.type === 'REMOVE_ITEM') {
+     	//...remove
+       
+       an item from the state
+     }
+     
+     return state;
+   }
+   ```
+
+   
 
 ## Redux and useReducer
 
@@ -701,7 +775,13 @@ The idea behind building custom Hooks is always to wrap and reuse code that goes
 
 在 React 中，给列表元素提供一个唯一的标识是为了帮助 React 有效地更新 DOM。这个唯一的标识通常使用 `key` 属性来指定。虽然不是绝对必需，但是在使用列表渲染时，给每个列表项提供一个唯一的 `key` 通常是一个良好的实践。
 
-template literal feature provided by JS by using backticks, which allow us to create a string where parts of that string are dynamic.
+
+
+template literal feature provided by JS by using backticks, which allow us to create a string where parts of that string are dynamic.在模板字符串中，`${}` 包裹的部分表示需要被解析和替换的表达式
+
+```
+`string text ${expression} string text`
+```
 
 strickMode, every component gets rendered twice by react during development to help us catch potential bugs and errors
 

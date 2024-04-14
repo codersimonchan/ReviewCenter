@@ -196,8 +196,15 @@ JS中的字符串需要使用引号引起来双引号或单引号都行
  该类型的值只有一个 undefined  
  使用typeof检查一个Undefined类型的值时，会返回"undefined"  
 
-#### 6.引用数据类型	  
+#### 6.引用数据类型	
+
+引用数据类型是指在程序中存储的数据，实际上是保存了对数据的引用（即内存地址），而不是数据本身的副本 .
+
+![img](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/40bbfb1b53e74be9b7c8d0280a7f463f~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
+
  Object 对象  
+
+![img](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f489efa909ce46f18cd424e8a6d8001e~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
 
 ### 类型转换  
 

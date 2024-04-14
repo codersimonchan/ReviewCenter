@@ -238,7 +238,7 @@ class Button extends React. Component {
 - 由于默认情况下，module.exports对象单词写起来比较复杂，为了简化向外共享成员的代码，node提供了exports对象，exports和module.exports指向的是同一个对象，所以使用exports挂载和module.exports挂载结果是一样的。
 
 
-- 使用 export 关键字可以导出模块中的多个变量、函数、类等，导进的内容和导出的内容需要使用相应的名称进行引用，使用 {} 包裹。
+- 使用 export 关键字可以导出模块中的多个变量、函数、类等，**导进的内容和导出的内容需要使用相应的名称进行引用**，使用 {} 包裹。
 
   ```
   // 导出变量和函数
@@ -493,13 +493,20 @@ class Button extends React. Component {
 
 卸载：unmount。同时，当 DOM 中  组件被删除的时候，应该[清除计时器](https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/clearInterval)。这在 React 中被称为“卸载（unmount）”
 
-生命周期回调函数，也叫生命周期钩子函数，即react会在合适的时间点，在组件挂载结束的时候，将生命周期函数钩出来执行一下。
+> 当组件从 DOM 树中被移除时，比如组件所在的父组件被重新渲染，导致该组件不再被包含在渲染结果中。
+>
+> 组件被销毁时，比如调用了 `ReactDOM.render()` 方法来将一个不同的组件渲染到相同的 DOM 节点上，或者在 React Router 中切换了路由导致组件被替换。
+>
+> 生命周期回调函数，也叫生命周期钩子函数，即react会在合适的时间点，比如在组件挂载结束的时候，或者比如在组件即将卸载的时候，将某些函数钩出来执行一下。这些函数就是生命周期回调函数。
+>
+> 在函数式组件中，由于没有类似于生命周期方法的概念，React 使用 `useEffect` Hook 来处理组件的卸载逻辑。你可以在 `useEffect` 的回调函数中返回一个清理函数，该清理函数会在组件卸载时被调用。
 
 ### 5.5.3 理解
 
-1. 组件从创建到死亡它会经历一些特定的阶段。
-2. React组件中包含一系列勾子函数(生命周期回调函数), 会在特定的时刻调用。
+1. 生命周期表示组件从创建到死亡它会经历一些特定的阶段，比如挂载，卸载。
+2. React组件中包含一系列勾子函数(生命周期回调函数), 会在特定的时刻调用，比如将要挂载，挂载完，将要被卸载，卸载完，以及组件的渲染render（去挂载）其实也是一个钩子。
 3. 我们在定义组件时，会在特定的生命周期回调函数中，做特定的工作。
+4. `useEffect` 是 React 中的一个 Hook，用于在函数组件中执行副作用操作（比如数据获取、订阅、或手动修改 DOM），类似于类组件中的生命周期函数。而生命周期函数（例如 `componentDidMount`, `componentDidUpdate`, `componentWillUnmount` 等）则是在**类组件**中用于管理组件生命周期的一组特殊方法, 虽然它们有不同的语法和执行时机，但实际上， `useEffect` 是为了取代类组件中的生命周期函数而设计的。
 
 ### 5.5.4 生命周期流程图（旧）
 
@@ -515,7 +522,7 @@ class Button extends React. Component {
 
    ​      3). render()
 
-   ​      4). componentDidMount()   = = = =>常用，一般在这个钩子中做一些初始化的事，例如开启定时器、               																				发送网络请求、订阅消息、开启监听, 发送ajax请求等
+   ​      4). componentDidMount()   = = = =>常用，一般在这个钩子中做一些初始化的事，例如开启定时器、发送网络请求、订阅消息、开启监听, 发送ajax请求等
 
 2. 更新阶段: 由组件内部this.setSate()或父组件重新render触发
 
@@ -543,7 +550,7 @@ class Button extends React. Component {
 
 <font color=red>				**getDerivedStateFromProps**</font>(新增，很少用，上官网了解即可)
 
-​																			（此方法适用于[罕见的用例](https://zh-hans.reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#when-to-use-derived-state)，即 state 的值在任何时候都取决于 props）
+​				（此方法适用于[罕见的用例](https://zh-hans.reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#when-to-use-derived-state)，即 state 的值在任何时候都取决于 props）
 
 ​				render()
 
@@ -565,13 +572,11 @@ class Button extends React. Component {
 
 ​					componentWillUnmount()
 
-
-
 ### 5.5.6 重要勾子和即将废弃的勾子
 
 1. 重要勾子
    - render：必须要使用，初始化渲染或更新渲染调用
-   -  componentDidMount：一般在这个钩子中做一些初始化的事，例如开启定时器、               													发送网络请求、订阅消息，开启监听, 发送ajax请求等
+   -  componentDidMount：一般在这个钩子中做一些初始化的事，例如开启定时器、发送网络请求、订阅消息，开启监听, 发送ajax请求等
    - componentWillUnmount：做一些收尾工作, 如: 清理定时器，取消订阅等
 2. 即将废弃的勾子
    -   componentWillMount
@@ -646,8 +651,6 @@ class Button extends React. Component {
 3. 项目的整体技术架构为: react + webpack + es6 + eslint
 
 4. 使用脚手架开发的项目的特点: 模块化, 组件化, 工程化
-
-
 
 ### 6.1.2 创建项目并启动
 
