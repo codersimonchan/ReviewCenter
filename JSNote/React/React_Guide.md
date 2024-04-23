@@ -117,6 +117,8 @@ var sayHi = function() {
 
 一个普通函数，可以传入数据，用相同的方法对不同的数据进行处理；而回调函数相当于在函数中传入一个算法（函数），用不同的算法对相同的数据进行处理。
 
+当函数作为参数被调用的时候，实际上就是将调用此函数的引用传递（指针）给了此参数，在函数内部需要被执行的地方再次调用此函数。因此称之为回调函数。
+
 ```
 function doSomethingAsync(callback) {
   setTimeout(() => {
@@ -147,7 +149,35 @@ doSomethingAsync((errs) => {
 });
 ```
 
-经过以上的调用，我们成功地延迟了errorCallback（）和logCallback（）函数的执行，而且是在只有抛出错误的情况下才会运行，因为这两个函数为同步函数，top level的函数，也是hoisted function，如果不放在异步web api中调用，直接调用的话，是不会达到延迟运行的效果的。这种方式**使得回调函数能够在某些特定的条件下被触发执行**，使代码更加灵活，特别是在处理异步操作、事件处理或需要延迟执行的场景中。
+经过以上的调用，我们成功地延迟了errorCallback（）和logCallback（）函数的执行，而且是在只有抛出错误的情况下才会运行，因为这两个函数都是同步函数，top level的函数，也是hoisted function，如果不放在异步web api中调用，直接调用的话，是不会达到延迟运行的效果的。这种方式**使得回调函数能够在某些特定的条件下被触发执行**，使代码更加灵活，特别是在处理异步操作、事件处理或需要延迟执行的场景中。
+
+
+
+当您将一个函数作为参数传递给另一个函数时，实际上是将函数的引用（指向函数在内存中的地址）传递给了该函数，而不是将函数的执行结果传递给了该函数。换句话说，函数参数接收到的是一个函数的指针，它指向内存中存储的函数代码，而不是实际的函数执行结果。函数作为参数传递时，传递的是函数的引用，而不是函数的执行结果。这意味着被传递的函数可以在**接收到参数的函数内部根据需要被调用**，而不是在传递时立即执行。
+
+```
+function doSomethingAsync(callback) {
+  setTimeout(() => {// 回调函数1
+    try {
+      // 假设在这里发生了一个错误
+      throw new Error("Something went wrong!");
+    } catch (err) {
+      // 将异常作为参数传递给回调函数
+      callback(err);//回调函数2
+      //console.log(err); //打印函数3
+    }
+  }, 1000);
+}
+```
+
+1. 当调用 `doSomethingAsync` 函数时，其被加入执行栈。
+2. 一秒钟后，定时器到期，回调函数1 被添加到任务队列中，在doSomethingAsync之上。
+3. JavaScript 引擎在调用栈为空时，从任务队列中取出回调函数1 执行。
+4. 在执行回调函数1 中，如果此时抛出一个错误，并被 `try...catch` 块捕获，然后调用 `callback(err)` 这个函数。
+5. `callback(err)` 这个函数被添加到任务队列中。
+6. JavaScript 引擎在调用栈再次为空时（说明回调函数1已经执行结束），从任务队列中取出回调函数2 执行。
+7. 综上可以保证回调函数2在回调函数1之后执行，即使在回调函数1当中，仍然有异步函数，在异步函数中发生了错误，也是异步函数优先进入调用栈，仍然可以保证回调函数2在异步函数发生错误后进行调用。
+8. 如果不使用回调函数2，直接使用console.log，那么就会直接将结果打印在控制台，无法有效利用callback那样，对错误进行处理，但是仍然也是可以这样写的。
 
 # Component
 
@@ -194,7 +224,7 @@ function App() {
 
 ## Dynamical value
 
-Outputting dynamic value with curly braces, but not wrapped by quotes. we can use that same syntax to load our images.
+Outputting dynamic value with **curly braces{}**, but not wrapped by quotes. we can use that same syntax to load our images.
 
 import image into JavaScript file is not something you can normally do in JavaScript, but here would work, because of that same build process in React, would also transform it. such as import ".css".
 
@@ -241,7 +271,7 @@ In react, you could **add event listeners** to elements by adding a special attr
 
 We could define a **function inside a component function**, this is allowed by JS. and these functions could be only called in this main component function. And the advantage of defining these event handler functions inside the component function is that they then have access to the component's props and state.
 
-在React中，将函数引用直接赋值给事件处理函数时，如果这个函数不需要接受任何参数，那么直接赋值是合适的. 传递函数的引用而不是函数的调用结果。这是因为传递引用允许 React 在适当的时机调用该函数
+在React中，将函数引用直接赋值给事件处理函数时，如果这个函数不需要接受任何参数，那么直接赋值是合适的. 传递函数的引用而不是函数的调用结果。这是因为传递引用允许 React 在适当的时机调用该函数。
 
 ```
 function handleClick() {
@@ -253,7 +283,7 @@ function handleClick() {
 ```
 上述代码中，`handleClick` 不接受任何参数，因此可以直接赋值给 `onClick` 事件处理函数。
 
-但是，如果你希望事件处理函数能够接收参数，例如事件对象，或者其他自定义参数，那么需要使用箭头函数或者在事件处理函数内部使用闭包。原因是在直接赋值的情况下，事件处理函数的调用是由React引擎进行的，不会传递额外的参数。而使用箭头函数或闭包可以提供更多的控制和灵活性，允许你传递自定义参数给事件处理函数。
+但是，如果你希望事件处理函数能够接收参数，例如其他自定义参数，那么需要使用箭头函数或者在事件处理函数内部使用闭包。**原因是在直接赋值的情况下，事件处理函数的调用是由React引擎进行的，并传递相关的事件对象作为参数，不会传递额外的参数**。而使用箭头函数或闭包可以提供更多的控制和灵活性，允许你传递自定义参数给事件处理函数。
 
 ```
 function handleClickWithParameter(param) {
@@ -558,7 +588,8 @@ function Example() {
     // 在组件渲染完成后执行
     document.title = `You clicked ${count} times`;
 
-    // 返回一个清理函数，用于组件卸载时执行清理操作
+    //如果是组件首次加载，首先会执行 useEffect 中的副作用函数, 不会d
+    //当组件重新渲染，并且 useEffect 中的依赖项发生了变化时，React 会先执行清理函数（如果存在），然后再次执行副作用函数。
     return () => {
       document.title = 'React App'; // 恢复原始的文档标题
     };
