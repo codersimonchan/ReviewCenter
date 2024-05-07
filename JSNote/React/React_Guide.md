@@ -569,13 +569,13 @@ export default App;
 
 ```
 
-# Side Effects
+# useEffect
 
-If update the state in an async function in a component, once state updated, function component will be re-executed again,  and then async  function would be re-executed again after component executed, and then state is updated, and then function component, which result in the infinite loop. 
+If update the state in an async function in a component, once state updated, the function component will be re-executed again,  and then the async function will be re-executed again after the component is executed, and then the state is updated, and then the function component, which results in the infinite loop. 
 
-we would use effect to solve infinite loop. use effect needs two arguments, and the first argument is a function(usually is a anonymous function) that should warp your side effect code, and the second argument is an array of dependencies of that effect function.
+we would use the effect to solve an infinite loop. use effect needs two arguments, and the first argument is a function(usually an anonymous function) that should warp your side effect code, and the second argument is an array of dependencies of that effect function.
 
-Because the idea behind useEffect is that this function which you pass as a first argument to useEffect **will be executed by React after every component execution**. If the second argument is an empty array , the effect function would only execute once. if you define the dependencies array,then React will actually take a look at the dependencies specified there, and it will only execute this effect function again if the dependency values changed. If you omit the array, will cause an infinite loop.
+The idea behind useEffect is that this function which you pass as a first argument to useEffect **will be executed by React after every component execution**. If the second argument is an empty array , the effect function would **only execute once**. if you define the dependencies array, then React will take a look at the dependencies specified there, and it will only execute this effect function again if the dependency values changed. If you omit the array, will cause an infinite loop.
 
 ```
 import React, { useState, useEffect } from 'react';
@@ -697,15 +697,15 @@ function App() {
 
 ### 见example，使用state减法器
 
-如果我们在上下文中，管理要分享出去的state，以及state更新函数，是一个很复杂的事情。这样导致上下文组件函数有点难以阅读。我们可以使用React提供的另一个状态管理的钩子useReducer ，而不是使用useState管理状态。
+如果我们在context中，管理要分享出去的state，以及state更新函数，是一个很复杂的事情。这样导致上下文组件函数有点难以阅读。我们可以使用React提供的另一个状态管理的钩子useReducer ，而不是再使用useState管理状态。
 
-1. A function that reduce one or more complex values to a simpler one. 比如通过将[5,10,100]这些数字相加，将一个数字数组减少为一个数字。以达到状态的管理目的。
+1. A function that reduce one or more complex values to a simpler one. 比如通过将[5,10,100]这些数字相加，将一个数字数组减少为一个数字，以达到状态的管理目的。
 
-2. useReducer hook, which also provided by react which allows us to manage more complex state. and also make it easier to move that state management logic out.
+2. useReducer hook, which is also provided by react, allows us to manage more complex state. and also make it easier to move that state management logic out.
 
 3. useReducer hook needs a reducer function as an input.
 
-4. the goal of this reducer function is to return a updated state object and action object, and this action object that will tell this function how to update this state。
+4. the goal of this reducer function is to return an updated state object and action object, and this action object will tell this function how to update this state。
 
 5. it is quite common to receive an object as a value for action, the object also has a ' type ' property.
 
@@ -802,19 +802,17 @@ function App() {
 
 The idea behind building custom Hooks is always to wrap and reuse code that goes into your component functions.
 
+自定义钩子函数的特点是它们可以使用React的Hooks API，比如 `useState`、`useEffect` 等。而自定义的标准函数是不可以
+
+自定义钩子函数的命名通常以 "use" 开头，例如 `useCustomHook`。
+
 # Tricks
 
-在 React 中，给列表元素提供一个唯一的标识是为了帮助 React 有效地更新 DOM。这个唯一的标识通常使用 `key` 属性来指定。虽然不是绝对必需，但是在使用列表渲染时，给每个列表项提供一个唯一的 `key` 通常是一个良好的实践。
+> 在 React 中，给列表元素提供一个唯一的标识是为了帮助 React 有效地更新 DOM。这个唯一的标识通常使用 `key` 属性来指定。虽然不是绝对必需，但是在使用列表渲染时，给每个列表项提供一个唯一的 `key` 通常是一个良好的实践。
 
+>template literal feature provided by JS by using backticks, which allow us to create a string where parts of that string are dynamic.在模板字符串中，`${}` 包裹的部分表示需要被解析和替换的表达式
+>
+>`string text ${expression} string text`
 
-
-template literal feature provided by JS by using backticks, which allow us to create a string where parts of that string are dynamic.在模板字符串中，`${}` 包裹的部分表示需要被解析和替换的表达式
-
-```
-`string text ${expression} string text`
-```
-
-strickMode, every component gets rendered twice by react during development to help us catch potential bugs and errors
-
-
+> strickMode, every component gets rendered twice by react during development to help us catch potential bugs and errors
 

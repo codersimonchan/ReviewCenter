@@ -740,13 +740,13 @@ class Button extends React. Component {
 
 2. 常用的ajax请求库
 
--   Query: 比较重, 如果需要另外引入不建议使用
+-   jQuery: 比较重, 如果需要另外引入不建议使用, 因为React本身就是想尽量减少操作真实DOM。
 
--   axios: 轻量级, 建议使用
+-   axios**[æksioʊ]** : 轻量级, 建议使用
 
   ​		1)   封装XmlHttpRequest对象的ajax
 
-  ​       2)    promise风格
+  ​       2)    返回的是promise
 
   ​       3)   可以用在浏览器端和node服务器端
 
@@ -800,7 +800,11 @@ class Button extends React. Component {
 
   
 
-### 6.2.3 react脚手架配置代理总结
+### 6.2.3 react脚手架配置代理Proxy[ 'prɔksi ]总结
+
+JavaScript 本身并不限制跨域访问，而是浏览器对跨域访问进行了限制，其中包括 XMLHttpRequest (XHR) 和 Fetch API 发起的 AJAX 请求。这些 AJAX 请求受到浏览器的同源策略限制，不能直接访问其他域的资源。通过服务器端代理可以绕过浏览器的同源策略限制。客户端发送请求到同源代理服务器，然后由服务器代理发送请求到目标服务器，并将响应返回给客户端。这样，客户端虽然是发送到同源服务器的请求，但最终获取了目标服务器的数据。
+
+以下两种方法都需要重启脚手架 
 
 1. 方法1
 
@@ -816,30 +820,30 @@ class Button extends React. Component {
    
    ​				2）缺点：不能配置多个代理。
    
-   ​				3）工作方式：上述方式配置代理，当请求了3000不存在的资源时，那么该请求会转发给5000					（优先匹配前端资源）
+   ​				3）工作方式：**上述方式配置代理，当请求了3000不存在的资源时，那么该请求会转发给5000（优先匹配前端资源）**
    
 2. 方法2：
 
    ​				1)第一步：创建代理配置文件
 
-   ​								在src下创建配置文件：src/setupProxy.js
+   ​					在src下创建配置文件：src/setupProxy.js，react脚手架会自动找到这个文件，要写common js的语法，因为会被加载到webpack里面执行，webpack是使用nodejs写的
 
    ​				2) 编写setupProxy.js配置具体代理规则：
 
    ```js
-   const proxy = require('http-proxy-middleware')
+   const proxy = require('http-proxy-middleware')//react 脚手架在初始化时，已经下载好了
       
       module.exports = function(app) {
         app.use(
-          proxy('/api1', {  //api1是需要转发的请求(所有带有/api1前缀的请求都会转发给5000)
-            target: 'http://localhost:5000', //配置转发目标地址(能返回数据的服务器地址)
-            changeOrigin: true, //控制服务器接收到的请求头中host字段的值
+          proxy('/api1', {  //遇见/api1前缀的请求，就会触发该代理配置
+            target: 'http://localhost:5000', //将请求转发给谁
+            changeOrigin: true, //控制服务器接收到的请求头中host字段的值, 表示本次请求是从哪里发出的
             /*
             	changeOrigin设置为true时，服务器收到的请求头中的host为：localhost:5000
             	changeOrigin设置为false时，服务器收到的请求头中的host为：localhost:3000
             	changeOrigin默认值为false，但我们一般将changeOrigin值设为true
             */
-            pathRewrite: {'^/api1': ''} //去除请求前缀，保证交给后台服务器的是正常请求地址(必须配置)
+            pathRewrite: {'^/api1': ''} //去除请求前缀，保证交给后台服务器的是正常请求地址(必须配置)，因为本来是不存在api1的
           }),
           proxy('/api2', { 
             target: 'http://localhost:5001',
@@ -875,7 +879,7 @@ class Button extends React. Component {
 
    ​    2）适用于任意组件间通信
 
-​              3）要在组件的componentWillUnmount中取消订阅
+​          3）要在组件的componentWillUnmount中取消订阅
 
 ###  6.2.5 扩展：Fetch(关注分离思想)
 
