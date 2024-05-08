@@ -227,11 +227,47 @@ docker attach 容器id   （进入容器正在执行的终端，不会启动新�
 
 ```
 docker cp 容器id：容器内路径 目的地主机路径
-将文件copy到zhu'ji'sha
+将文件copy到主机上
 docker cp b8453025116：home/test.jave /home
 ```
 
 
+
+**部署Nginx**
+
+```
+# pull the images
+docker pull ngin
+# 将容器内80端口，映射给宿主机3344端口，这意味着你可以通过访问主机的 3344 端口来访问容器中运行的 Nginx 服务
+docker run -d --name nginx01 -p 3344:80 nginx (将容器内80端口，映射给服务器3344端口)
+# check docker contianer
+docker ps
+# 访问服务器3344端口，本机自测
+curl localhost:3344
+
+进入容器
+查看nginx内部配置文件
+```
+
+思考问题：我们每次改动nginx配置文件，都需要进入容器内部，十分麻烦，我要是可以在容器外部提供一个映射路径，使容器内部就可以自动修改? -v 数据卷。
+
+**部署Tomcat**
+
+```
+# docker run也会自动帮我们下载
+docker run -it --rm tomcatL9.0
+# 我们之前的启动都是后台，停止了容器之后，容器还是可以查到， 以上一般用来测试，用完就删除 docker run -it --rm，不建议这么用
+
+docker pull tomcat
+docker pull tomcat:9.0
+# start tomcat
+docker run -d -p 3355:8080 --name tomcat01 tomcat
+# 进入容器，发现 1，Linux命令少了，2 没有webapps。 因为镜像原因，默认为最小的镜像，所有不必要的都剔除掉，保证最小化可用。
+docker exec -it tomcat01 /bin/bash
+
+```
+
+思考问题：如果以后要部署项目，如果每次都进入容器是不是十分麻烦，我要是可以在容器外部提供一个映射路径，webapps，我们在外部防止项目，就自动同步到内部就好了。
 
 ## 容器化
 
