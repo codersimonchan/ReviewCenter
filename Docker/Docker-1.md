@@ -269,6 +269,54 @@ docker exec -it tomcat01 /bin/bash
 
 思考问题：如果以后要部署项目，如果每次都进入容器是不是十分麻烦，我要是可以在容器外部提供一个映射路径，webapps，我们在外部防止项目，就自动同步到内部就好了。
 
+**可视化**
+
+- portainer可视化面板安装
+
+  什么是portainer，是docker图形化界面管理工具，提供一个后台面板供我们操作。
+
+  ```
+  docker run -d -p 8088:9000 \
+  --restart=always -v /var/run/docker.sock:/var/run/docker.sock --privileged=true portainer/portainer
+  ```
+
+  访问测试：外网： 8088
+
+  可视化面板我们平时不会使用，大家自己测试玩玩即可。
+
+  # 
+
+# Docker 镜像讲解
+
+镜像是一种轻量级，可执行的独立软件包，用来打包润建运行环境和基于运行环境开发的软件，它包含运行某个软件所需要的所有内容，包括代码、运行时，库，环境变量和配置文件。
+
+所有的应哟个，直接打包成docker镜像，就可以直接跑起来。
+
+如何得到镜像：
+
+从远程仓库下载
+
+朋友copy给你
+
+自己制作一个镜像DockerFile
+
+### 镜像原理之联合文件系统
+
+- Docker 镜像采用了分层的设计，每一层都包含了文件系统的一部分，而这些层通过 UnionFS 进行联合。当你创建一个新的镜像时，Docker 会在现有的镜像基础上创建一个新的容器层，该容器层与之前的层通过 UnionFS 进行联合，形成一个新的镜像。
+
+- 通过这种分层的设计，Docker 镜像可以实现高效的复用和共享。如果两个镜像都使用了相同的基础镜像，那么它们会共享相同的基础层，而不需要重复存储相同的文件。这样可以节省存储空间，并且加快镜像的下载和部署速度。
+
+- 比如我们分别拉取了镜像Centos，MySql以及Mongodb，假如Mysql和Mongdb都是运行在Centos上面，那么我们只需要一个Centos就可以了。
+
+  ![](C:\Users\simon.cheng\Documents\ReviewCenter\Docker\Docker-1\images.png)
+
+  ![](C:\Users\simon.cheng\Documents\ReviewCenter\Docker\Docker-1\newimage.png)
+
+  
+
+  
+
+
 ## 容器化
 
 就是将应用程序打包成容器，然后在容器中运用应用程序的过程，这个过程简单来说可以分成三个步骤
