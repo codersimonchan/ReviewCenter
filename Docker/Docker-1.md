@@ -308,9 +308,9 @@ docker exec -it tomcat01 /bin/bash
 
 - 比如我们分别拉取了镜像Centos，MySql以及Mongodb，假如Mysql和Mongdb都是运行在Centos上面，那么我们只需要一个Centos就可以了。
 
-  ![](C:\Users\simon.cheng\Documents\ReviewCenter\Docker\Docker-1\images.png)
+  ![](Docker-1/images.png)
 
-  ![](C:\Users\simon.cheng\Documents\ReviewCenter\Docker\Docker-1\newimage.png)
+  ![](Docker-1/newimage.png)
 
   
 
