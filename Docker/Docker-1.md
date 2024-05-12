@@ -284,8 +284,6 @@ docker exec -it tomcat01 /bin/bash
 
   可视化面板我们平时不会使用，大家自己测试玩玩即可。
 
-  # 
-
 # Docker 镜像讲解
 
 镜像是一种轻量级，可执行的独立软件包，用来打包润建运行环境和基于运行环境开发的软件，它包含运行某个软件所需要的所有内容，包括代码、运行时，库，环境变量和配置文件。
@@ -300,7 +298,7 @@ docker exec -it tomcat01 /bin/bash
 
 自己制作一个镜像DockerFile
 
-### 镜像原理之联合文件系统
+## 镜像原理之联合文件系统
 
 - Docker 镜像采用了分层的设计，每一层都包含了文件系统的一部分，而这些层通过 UnionFS 进行联合。当你创建一个新的镜像时，Docker 会在现有的镜像基础上创建一个新的容器层，该容器层与之前的层通过 UnionFS 进行联合，形成一个新的镜像。
 
@@ -312,9 +310,53 @@ docker exec -it tomcat01 /bin/bash
 
   ![](Docker-1/newimage.png)
 
-  
+## commit 镜像
 
-  
+如何自己提交一个镜像
+
+```
+docker commit 提交容器称为一个新的副本镜像
+
+#命令和git原理类似
+docker commit -m="提交的描述信息" -a="作者" 容器id 目标镜像名：[TAG]
+```
+
+实战测试
+
+```
+1.启动一个默认的tomcat
+2.发现这个默认的tomcat是没有webapps应用，官方的镜像默认webapps下面是没有文件的。
+3.我自己拷贝进了进本文件
+4.然后将修改过的容器提交为一个新的镜像，这样我们就可以直接使用我们修改过的镜像即可。
+docker commit -m='' -a='' 7e119b82cff6 tomcat02:1.0
+这样repository里面就有一个名为tomcat02，TAG为1.0的镜像。
+```
+
+## 容器数据卷
+
+数据如果也存在容器当中，那么容器删除，数据就会丢失了，那么我们需求数据可以持久化。
+
+比如MySQL，容器删了，删库跑路，需求：MySQL数据可以存储在本地！
+
+容器之间可以有一个数据共享的技术，Docker容器中产生的数据，同步到本地。
+
+这就是卷技术，目录的挂载，将我们容器内的目录，挂载到Linux上面。
+
+总结：容器的持久化和同步操作！荣期间也是可以数据共享的。
+
+### 使用数据卷
+
+```
+docker run -it -v 主机目录：容器内目录 images /bin/bash
+
+docker run -it -v /home/ceshi:/home centos /bin/bash
+ceshi 是linux上文件夹， /home是docker容器中文件夹，二者文件夹内容的是同步的。
+
+docker inspect 容器id
+查看rong'qi
+```
+
+
 
 
 ## 容器化
