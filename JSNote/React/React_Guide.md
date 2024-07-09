@@ -2,13 +2,13 @@
 
 # JSX
 
-**J**avaScript **S**yntax e**X**tension, this extension allows developers to describe and create HTML elements by writing HTML markup code inside of JavaScript files. With React, you write declarative code(声明式编程)， which means you define the target HTML structure component, don't have to handle DOM directly.  Only care what to do, don't have to worry how to do. For example, SQL is also declarative code. But JSX is  a feature that's not supported by browsers. So before it reaches the browser, It's transformed behind the scenes(ReactDOM will be responsible for outputting the those component's content on the screen) to code that does work in browser.
+**J**avaScript **S**yntax e**X**tension, this extension allows developers to describe and create HTML elements by writing HTML markup code inside of JavaScript files. With React, you write declarative code(声明式编程)， which means you define the target HTML structure component, and don't have to handle DOM directly.  Only care what to do, don't have to worry how to do. For example, SQL is also declarative code. But JSX is a feature that's not supported by browsers. So before it reaches the browser, It's transformed behind the scenes(ReactDOM will be responsible for outputting those components' content on the screen) to code that does work in the browser.
 
-Vite is a modern build tool used for web development, Vite can transform JSX (JavaScript XML) code. Vite is designed to handle JSX syntax commonly used in React applications. It has built-in support and configurations that allow developers to  write JSX code directly within their Vue.js or React projects. That is why we could write JSX file even without babel in overall project.
+Vite is a modern build tool used for web development, Vite can transform JSX (JavaScript XML) code. Vite is designed to handle JSX syntax commonly used in React applications. It has built-in support and configurations that allow developers to write JSX code directly within their Vue.js or React projects. That is why we could write JSX files even without Babel in the overall project.
 
 # Destructing Assignment
 
-Destructing in JavaScript is a convenient way to extract values from  objects or arrays and assign them to variables using a syntax that looks similar to the structure being extracted. It allows you to unpack  values from arrays or properties from objects into distinct variables. It's a powerful feature used for various purposes like copying arrays,  merging arrays, passing function arguments, and creating shallow copies  of objects.
+Destructing in JavaScript is a convenient way to extract values from objects or arrays and assign them to variables using a syntax that looks similar to the structure being extracted. It allows you to unpack  values from arrays or properties from objects into distinct variables. It's a powerful feature used for various purposes like copying arrays,  merging arrays, passing function arguments, and creating shallow copies of objects.
 
 是一种在 JavaScript 中从数组或对象中提取数据并赋值给变量的语法
 
@@ -34,9 +34,16 @@ The spread operator (`...`) in JavaScript is a syntax that  allows an iterable (
 const numbers = [1, 2, 3];
 const newNumbers = [...numbers, 4, 5];
 
-In this example, the ...numbers syntax spreads the elements of the numbers array into individual elements, which are then included in the newNumbers array.
+In this example, the ...numbers syntax spreads the elements of the numbers array into individual elements, which are then included in the newNumbers array.扩展运算符只会对对象的第一层进行拷贝，而不会递归地拷贝嵌套的对象。这就导致了属性的子对象仍然共享相同的引用。
 
-
+结论：
+    扩展运算符（spread operator）会创建对象的浅拷贝。
+    对象属性如果是引用类型（如对象或数组），那么它们的引用仍然是共享的，这就是浅拷贝的特性。
+    深拷贝需要递归地拷贝对象的所有层级，可以使用 JSON.parse(JSON.stringify()) 或 lodash 的 cloneDeep。
+    
+    JSON.stringify() 是一个 JavaScript 方法，用于将 JavaScript 对象或值转换为 JSON 字符串。它通常与 JSON.parse() 一起使用，后者用于将 JSON 字符串转换回 JavaScript 对象。
+    
+    JSON.parse() 是一个 JavaScript 方法，用于将 JSON 字符串解析为 JavaScript 对象。它通常与 JSON.stringify() 一起使用，后者用于将 JavaScript 对象转换为 JSON 字符串。
 ```
 
 ```
@@ -187,9 +194,9 @@ The function must return a actual html that can be rendered('displayed on the sc
 
 ## Custom Components
 
-Name starts with uppercase, wraps html elements or other custom components. its name usually starts with an uppercase letter by convention (e.g., `MyComponent`).  **components are JavaScript functions or classes that return JSX** ,When the component is called (rendered), React executes that component function and processes the returned JSX（实际上就是react的virtual DOM）. React then analyzes the returned JSX to understand the structure of the  UI and creates a virtual representation of the DOM called the "virtual  DOM tree."  This virtual DOM is a lightweight copy of the actual DOM and contains React elements representing the UI.
+Name starts with uppercase, wraps html elements or other custom components. its name usually starts with an uppercase letter by convention (e.g., `MyComponent`).  **components are JavaScript functions or classes that return JSX**, When the component is called (rendered), React executes that component function and processes the returned JSX（实际上就是react的virtual DOM）. React then analyzes the returned JSX to understand the structure of the  UI and creates a virtual representation of the DOM called the "virtual  DOM tree."  This virtual DOM is a lightweight copy of the actual DOM and contains React elements representing the UI.
 
-React performs a process called "reconciliation" (对账) where it compares the  previous virtual DOM with the newly generated one to identify the  differences (diffing). React efficiently updates only the parts of the  real DOM that have changed, minimizing unnecessary re-rendering and  improving performance.
+React performs a process called "reconciliation" (对账) where it compares the previous virtual DOM with the newly generated one to identify the differences (diffing). React efficiently updates only the parts of the real DOM that have changed, minimizing unnecessary re-rendering and improving performance.
 
 Eventually, React translates the processed JSX into actual HTML elements and updates the real DOM to reflect those changes, resulting in the  updated user interface being displayed in the browser.
 
@@ -230,7 +237,7 @@ import image into JavaScript file is not something you can normally do in JavaSc
 
 ## Making components reusable  with Props
 
-如果一个组件我们想重复使用四次，但是每次使用的时候，应该填充不同的数据。React allows you to pass data to component via a concept called "Props", Therefore, React will pass a value for this props parameter to this function when it calls it. 所以在创建组件的时候，会携带一个参数，这个参数就是Props属性，Props是一个拥有键值对的对象。收集所有该组件的属性。
+如果一个组件我们想重复使用四次，但是每次使用的时候，应该填充不同的数据。React allows you to pass data to component via a concept called "Props", Therefore, React will pass a value for this props parameter to this function when it calls it. 所以在创建组件的时候，会携带一个参数，这个参数就是Props属性，Props是一个拥有**键值对的对象**。收集所有该组件的属性。
 
 ```
 function Greeting(person) {
@@ -265,13 +272,13 @@ Children is a prop that is not set with help of component attributes like others
 
 ![image-20231101183507457](C:\Users\simon.cheng\AppData\Roaming\Typora\typora-user-images\image-20231101183507457.png)
 
-## React to Events
+## React Responding to Events
 
 In react, you could **add event listeners** to elements by adding a special attribute or called props to those HTML elements. Those HTML  elements (Native HTML elements) support many on-something props, such as 'onClick'. and value you should provide for any event should be a function. Then we can define this function.  
 
 We could define a **function inside a component function**, this is allowed by JS. and these functions could be only called in this main component function. And the advantage of defining these event handler functions inside the component function is that they then have access to the component's props and state.
 
-在React中，将函数引用直接赋值给事件处理函数时，如果这个函数不需要接受任何参数，那么直接赋值是合适的. 传递函数的引用而不是函数的调用结果。这是因为传递引用允许 React 在适当的时机调用该函数。
+在React中，将函数引用直接赋值给事件处理函数时，如果这个函数不需要接受任何参数，那么直接赋值是合适的. 传递函数的引用而不是调用函数。这是因为传递引用允许 React 在适当的时机调用该函数。
 
 ```
 function handleClick() {
@@ -283,7 +290,7 @@ function handleClick() {
 ```
 上述代码中，`handleClick` 不接受任何参数，因此可以直接赋值给 `onClick` 事件处理函数。
 
-但是，如果你希望事件处理函数能够接收参数，例如其他自定义参数，那么需要使用箭头函数或者在事件处理函数内部使用闭包。**原因是在直接赋值的情况下，事件处理函数的调用是由React引擎进行的，并传递相关的事件对象作为参数，不会传递额外的参数**。而使用箭头函数或闭包可以提供更多的控制和灵活性，允许你传递自定义参数给事件处理函数。
+但是，如果你希望事件处理函数能够接收参数，例如其他自定义参数，那么需要使用箭头函数或者在事件处理函数内部使用闭包。**原因是在直接赋值的情况下，事件处理函数的调用是由React引擎进行的，并传递相关的事件对象作为参数，不会传递额外的参数**。而使用箭头函数或闭包可以提供更多的控制和灵活性，允许你传递**自定义参数**给事件处理函数。这样确保了事件处理程序在点击按钮时执行，而不是在组件渲染时立即执行。
 
 ```
 function handleClickWithParameter(param) {
@@ -300,6 +307,11 @@ function handleClickWithParameter(param) {
 我们使用了箭头函数和闭包，以便将自定义参数传递给事件处理函数。这样做可以提供更大的灵活性，根据需要传递不同的参数。
 
 The event handler should pass the event object to the function if you want to access the event data and the value of the input element.
+
+************
+
+- **直接传递函数引用**：父组件将处理函数的引用传递给子组件，此时无需传递参数，而子组件在适当的时间调用该函数，并传递所需参数。
+- **自定义参数**：如果你需要在事件处理函数中传递自定义参数（例如字符串 `'test'`），则使用箭头函数或闭包函数来封装调用。
 
 ## Managing State & Hooks
 
@@ -366,7 +378,7 @@ When updating your state based on the previous value of that state, you should p
 
 "Immutably" 是 "immutable"（不可变的）一词的副词形式。在编程领域，不可变性是指一旦创建了一个对象，就不要更改其内容或状态。相反，任何修改操作都将返回一个新的对象，而不是直接修改原始对象。
 
-In an immutable way, which simply means you create a copy of the old state object, so a new object or a new array first. and then you just change that copy instead of that existing object or array. And the reason for that recommendation is that if your state is an object or array, you are dealing with a reference value in JavaScript. And therefore if you update an object or array directly.  You would be updating the old value in-memory immediately. And this can again lead to strange bugs or side  effects if you have multiple places in your application that are using that object or array.
+In an immutable way, which simply means you create a copy of the old **state object,** so a new object or a new array first. and then you just change that copy instead of that existing object or array. And the reason for that recommendation is that if your state is an object or array, you are dealing with a reference value in JavaScript. And therefore if you update an object or array directly.  You would be updating the old value in-memory immediately. And this can again lead to strange bugs or side effects if you have multiple places in your application that are using that object or array.
 
 利用展开运算符，创建新的对象，是一种shallow copy, 创建了一个新的对象。对于浅拷贝后的对象来说，在第一层级上，新创建的对象与原始对象是独立的，但对于嵌套对象或数组等引用类型的属性，它们还是会共享相同的引用地址。
 
@@ -449,9 +461,9 @@ Therefore simply is that as a React developer, you should always look for opport
 
 If we have some inputs in a form, usually we manage what the user enters by simply keeping track of it with the state. with every keystroke, we update our state. so with every keystroke, we update the value we get by the user and we store it in our state. That is a  perfectly fine way of managing this.
 
-But updating a state with every keystroke(按键)， when we only need it when we submit the form, sounds a bit redundant to me, that is a scenario where refs could help us, though they are not limited to that.
+But updating a state with every keystroke(按键)， when we only need it when we submit the form, sounds a bit redundant to me, that is a scenario where 'references' could help us, though they are not limited to that.
 
-ref 也是react组件的一个属性，像key属性一样，是一个特殊的属性。这个属性接收一个ref的值作为输入，这样这个输入组件在最后连接到这个ref值。
+ref 也是react组件的一个属性，像key属性一样，是一个特殊的属性。这个属性接收一个ref的变量作为输入，这样这个输入组件在最后连接到这个ref值。这种方式非常适合需要在组件中**保存可变数据而不希望重新渲染**的场景.
 
 ```
 import React, { useRef } from 'react';
@@ -608,9 +620,13 @@ export default Example;
 
 在这个示例中，我们使用 `useEffect` 来更新文档标题。当组件渲染完成后，`useEffect` 中的 effect 函数会执行，将文档标题设置为当前点击次数。另外，我们传递了一个依赖数组 `[count]`，这意味着 effect 函数仅在 `count` 发生变化时才会重新执行。
 
-当 React 完成对组件的渲染时，会调用 `useEffect` 中的副作用函数。
+当 React 完成对组件的渲染时，会调用 `useEffect` 中的副作用函数。具体来说，`useEffect` 的行为类似于 `componentDidMount` 和 `componentDidUpdate`，它会在组件渲染到屏幕之后执行。通过 `useEffect` 获取异步数据后，再使用状态钩子 (`useState`) 来管理数据状态。
 
-如果提供了依赖数组，并且其中的依赖项发生了变化，那么 React 会先调用副作用函数的清理函数，然后再调用新的副作用函数。执行清理函数之后再执行新的副作用函数的主要目的是确保新的副作用函数执行时处于一个干净的状态。如果不执行清理函数，而是直接执行新的副作用函数，可能会导致之前的副作用产生的一些未清理的状态或资源泄露影响到新的副作用函数的正确执行，例如取消订阅、清除定时器、清除副作用产生的临时数据等。这样可以避免出现未经处理的副作用，从而提高了应用的健壮性。
+更新页面。
+
+
+
+如果提供了依赖数组，并且其中的依赖项发生了变化，那么 React 会先调用副作用函数的**清理函数**，然后再调用新的副作用函数。执行清理函数之后再执行新的副作用函数的主要目的是确保新的副作用函数执行时处于一个干净的状态。如果不执行清理函数，而是直接执行新的副作用函数，可能会导致之前的副作用产生的一些未清理的状态或资源泄露影响到新的副作用函数的正确执行，例如取消订阅、清除定时器、清除副作用产生的临时数据等。这样可以避免出现未经处理的副作用，从而提高了应用的健壮性。
 
 异步操作是副作用的一种常见形式，因为它们通常不会立即返回结果，而是在一段时间后返回结果。这包括网络请求、定时器、事件监听器等。异步操作的结果可能会影响App的状态或行为，因此它们被视为副作用。
 

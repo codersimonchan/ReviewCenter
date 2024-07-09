@@ -251,7 +251,7 @@ class Button extends React. Component {
   import {  myVariable as customVariable, myFunction as customFunction } from './module';
   ```
 
-- 使用 export default 导出的内容, 在import引用时可以使用任意名称引用，并且不需要使用 {} 包裹。语句用于导出模块的默认值，一个模块中只能有一个默认导出。
+- 使用 export default 导出的内容, 在import引用时可以使用任意名称引用，并且不需要使用 {} 包裹。语句用于导出模块的默认值，一个模块中**只能有一个默认导出**。
 
   ```
   // 导出默认值
@@ -696,7 +696,7 @@ class Button extends React. Component {
 >
 >​           index.css ------ 通用型样式
 >
->​          <font color=red>  **index.js -------** **入口文件**</font>，引入react核心库，引入react-dom，引入app组件，在此渲染组件到index.html页面（至于index.js与              index.html 如何关联，是脚手架内部写好的）。
+>​          <font color=red>  **index.js -------** **入口文件**</font>，引入react核心库，引入react-dom，引入app组件，在此**渲染app等组件到index.html页面**（至于index.js与index.html 如何关联，是脚手架内部写好的）。
 >
 >​           logo.svg ------- logo图
 >

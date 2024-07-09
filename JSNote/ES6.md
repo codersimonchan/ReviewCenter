@@ -1040,23 +1040,27 @@ console.log(`Hi ${user}!`); // Hi Barret!
 for...of 用于遍历一个迭代器，如数组：
 
 ```
-let nicknames = ['di', 'boo', 'punkeye'];
-nicknames.size = 3;
-for (let nickname of nicknames) {
-  console.log(nickname);
+const array = ['a', 'b', 'c'];
+for (const value of array) {
+  console.log(value); // 输出 'a', 'b', 'c'
 }
-// 结果: di, boo, punkeye
+
+const string = 'hello';
+for (const char of string) {
+  console.log(char); // 输出 'h', 'e', 'l', 'l', 'o'
+}
+
 ```
 
 for...in 用来遍历对象中的属性：
 
 ```
-let nicknames = ['di', 'boo', 'punkeye'];
-nicknames.size = 3;
-for (let nickname in nicknames) {
-  console.log(nickname);
+const object = { a: 1, b: 2, c: 3 };
+for (const key in object) {
+  console.log(key); // 输出 'a', 'b', 'c'
+  console.log(object[key]); // 输出 1, 2, 3
 }
-Result: 0, 1, 2, size
+
 ```
 
 ### 11. Map 和 WeakMap
@@ -1321,6 +1325,5 @@ numbers.next(); // { value: 3, done: false }
 ```
 
 每次执行 yield 时，返回的值变为迭代器的下一个值。
-
 
 
