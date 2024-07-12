@@ -165,6 +165,8 @@ docker pull mysql:5.7
 
 ```
 docker rmi -f e73346bdf465（镜像id） #删除指定的镜像
+# 是rmi 是remove image的缩写
+# -f 是force的意思，强制删除镜像
 ```
 
 #### 容器命令
@@ -172,8 +174,8 @@ docker rmi -f e73346bdf465（镜像id） #删除指定的镜像
 **说明**：我们有了镜像才可以创建容器，我们下载一个linux发行版centos镜像测试学习。
 
 ```
-docker pull centos 下载centos
-docker images 查看
+docker pull centos #下载centos
+docker images #查看
 ```
 
 **新建容器并启动**
@@ -183,7 +185,56 @@ docker run -it centos /bin/bash
 docker run [可选参数] images
 ```
 
-![image-20240506195220835](C:\Users\simon.cheng\AppData\Roaming\Typora\typora-user-images\image-20240506195220835.png)
+>### 常用参数说明
+>
+>**-d, --detach**
+>
+>分离的意思，在后台运行容器并返回容器ID。
+>
+>**-it**
+>
+>- **-i, --interactive**：保持标准输入打开（用于交互式会话）。
+>- **-t, --tty**：分配一个伪终端。
+>
+>**--name**
+>
+>- **作用**：为容器指定一个名称。
+>
+>**-p, --publish**
+>
+>- **作用**：将容器的端口映射到主机的端口。
+>
+>**-v, --volume**
+>
+>- **作用**：绑定挂载一个卷。
+>
+>**--rm**
+>
+>- **作用**：在容器停止后自动删除容器。
+>
+>**-e, --env**
+>
+>- **作用**：设置环境变量。
+>
+>**--network**
+>
+>- **作用**：指定容器连接的网络。
+
+```
+docker run -d -p 8080:80 --name my-nginx -v /my/local/content:/usr/share/nginx/html -e NGINX_HOST=myhost -e NGINX_PORT=80 nginx
+```
+
+解释：
+
+- `-d`：在后台运行容器。在 Docker 中，后台运行容器指的是以守护进程（daemon）模式运行容器，使其在后台运行，不会阻塞终端。这样你可以继续在终端执行其他命令，而容器在后台继续运行。
+- 
+- `-p 8080:80`：将主机的 8080 端口映射到容器的 80 端口。
+- `--name my-nginx`：为容器指定名称 `my-nginx`。
+- `-v /my/local/content:/usr/share/nginx/html`：将主机的目录 `/my/local/content` 挂载到容器的 `/usr/share/nginx/html` 目录。
+- `-e NGINX_HOST=myhost` 和 `-e NGINX_PORT=80`：设置环境变量 `NGINX_HOST` 和 `NGINX_PORT`。
+- `nginx`：使用 `nginx` 镜像。
+
+通过这些参数，你可以灵活地控制容器的行为和配置。
 
 **列出所有的运行的容器**
 
@@ -353,41 +404,254 @@ docker run -it -v /home/ceshi:/home centos /bin/bash
 ceshi 是linux上文件夹， /home是docker容器中文件夹，二者文件夹内容的是同步的。
 
 docker inspect 容器id
-查看rong'qi
+查看容器挂载的详细信息
 ```
 
+### 实战：安装MySQL
 
+思考：MySQL的数据持久化的问题
 
+![](C:\Users\simon.cheng\Documents\ReviewCenter\Docker\Docker-1\mysqlexample.png)
 
-## 容器化
+### 具名和匿名挂载
 
-就是将应用程序打包成容器，然后在容器中运用应用程序的过程，这个过程简单来说可以分成三个步骤
+将挂载的卷命名就是具名挂载，否则就是匿名挂载，他们不需要宿主机路径，会有一个默认路径。
 
-1. 创建要给Dockerfile，来告诉docker 构建应用程序镜像所需要的步骤和配置
-2. 使用Dockerfile来构建镜像
-3. 使用镜像创建和运行容器
-4. **容器是一种对进程进行隔离的运行环境。**
+![](C:\Users\simon.cheng\Documents\ReviewCenter\Docker\Docker-1\volume.png)
 
-Dockerfile是一个根目录下的创建文件，里面包含了一条条的指令，用来告诉Docker 如何来构建镜像，这个镜像文件中包括了我们应用程序的所有指令，也就是我们刚刚提到的，各种依赖，环境配置和运行应用程序所需要的所有内容。Docker就会根据这个Dockerfile文件，来构建一个镜像。有了镜像之后，我们就可以使用这个镜像来创建容器。然后在容器中运行应用程序。
+查看卷volume的具体位置
 
-![image-20231204214806273](C:\Users\simon.cheng\AppData\Roaming\Typora\typora-user-images\image-20231204214806273.png)
+![](C:\Users\simon.cheng\Documents\ReviewCenter\Docker\Docker-1\mount.png)
+
+ 如何确定是具名挂载还是匿名挂载，还是指定路径挂载呢？
+
+```
+-v 容器内路径   #匿名挂载
+-v 卷名:容器内路径  #具名挂载
+-v /宿主机路径::容器内路径  #指定挂载路径
+通过 -v 容器内路径:ro rw 改变读写权限
+ro readonly #只读
+rw readwrite #可读可写
+
+docker run -d -P --name nginx02 -v juming-nginx:/etc/nginx/:ro nginx
+docker run -d -P --name nginx02 -v juming-nginx:etc/nginx:rw nginx
+只要看到ro 就说明路径只能通过宿主机改变，容器内是无法操作的。
+```
+
+# 初识Dockerfile
+
+Dockerfile 就是用来构建docker镜像的构建文件，是一个命令脚本，先体验一下，通过这个脚本可以生成镜像。
+
+镜像是一层一层的，脚本是一个个命令，每个命令是一层
+
+```
+# 创建一个dockerfile文件，名字可以随机，建议Dockerfile
+# 文件中的内容， 指令(大写) 参数
+FROM centos
+
+VOLUME ["volume01","volume02"] //匿名挂载，默认挂载到宿主机
+
+CMD echo "----end----"
+
+CMD /bin/bash
+
+# 这里的每个命令，就是镜像的一层
+```
+
+ 这种方式我们未来使用的十分多，因为我们通常会构建自己的镜像！
+
+## 数据卷容器
+
+![](C:\Users\simon.cheng\Documents\ReviewCenter\Docker\Docker-1\share.png)
+
+容器之间实现数据同步。
+
+```
+--volumes-from
+相当于 子继承父，那么父镜像中挂载的数据卷，在儿子中都是同步和共享的。
+测试：可以删除docker01，查看docker02和docker03，看看是否还是可以访问呢
+是可以访问的，相当于一种备份机制。
+
+这也就是说，多个mysql实现数据共享
+```
+
+结论：
+
+容器之间配置信息的传递，数据卷生命周期一直持续到没有容器使用位置。但是一旦你持久化到了本地，这个时候本地的数据是不会删除的。
+
+## 构建步骤
+
+```
+编写一个dockerfile 文件
+docker build 构建成镜像
+docker run 运行镜像
+docker push 发布镜像（DockerHub）
+```
 
 ## 构建镜像
 
+### 基础知识
+
 ```
-# Make base image change if needed to use the required node version
-FROM node:18.16.0-slim as builder
-WORKDIR /app
-COPY . .
-RUN yarn install && yarn build
-
-FROM nginx:1.23-alpine
-COPY --from=builder /app/dependencies/nginx/defaultk8s.conf /etc/nginx/conf.d/default.conf
-COPY --from=builder /app/build /usr/share/nginx/html
-
-
-COPY source(相对于Dockerfile文件的路径) dest（相对于镜像的路径）
+1.每个保留关键字都是必须大写字母
+2.#表注释
+3.从上到下顺序执行
+4.每一个指令都会创建一个新的镜像层，并提交
 ```
+
+dockerfile是面向开发，我们以后要发布项目，做镜像，就需要编写dockerfile文件，这个文件十分简单。docker镜像逐渐称为企业交付的标准，必须要掌握。
+
+## 指令说明
+
+```
+FROM        # 基础镜像 一切从这里开始构建 centos
+MAINTAINER  # 镜像是谁写的，姓名+邮箱
+RUN         # 镜像构建时需要执行的一些命令
+ADD         # 比如说我想搭建里面有tomcat的容器，比如在centos上面添加tomcat
+WORKDIR     # 镜像的当前工作目录
+VOLUME      # 挂载的目录
+EXPOST      # 保留端口的位置
+CMD         # 指定这个容器启动的时候要运行的命令，只有最后一个会生效，可被替代
+ENTRYPOINT  # 指定这个容器启动的时候要运行的命令，可以追加命令
+ONBUILID    # 刚构建一个被继承的DockerFile 这个时候就会运行ONBUILD 的指令，触发指令
+COPY        # 类似ADD，将我们文件拷贝到镜像中
+ENV         # 构建的时候设置环境变量
+```
+
+### 实战测试
+
+Docker Hub 中99%的镜像都是从scratch开始的，然后配置需要的软件和配置进行进一步的构建。
+
+### 发布自己的镜像
+
+```
+#DockerHub
+```
+
+确定账号可以登录，在我们服务器行提交自己的镜像。
+
+### Docker所有流程小结 
+
+![img](https://img-blog.csdnimg.cn/20200813194116511.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2ZhbmppYW5oYWk=,size_16,color_FFFFFF,t_70#pic_center)
+
+![img](https://img-blog.csdnimg.cn/2020081319424581.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2ZhbmppYW5oYWk=,size_16,color_FFFFFF,t_70#pic_center)
+
+
+
+# Dokcer网络
+
+>我们发现这个容器带来的网卡，都是一对对的。
+>
+>veth-pair 就是一堆的虚拟设备接口，他们都是成对出现的，一端连着协议，一段彼此相连。
+>
+>正因为有这个特性，veth-pair充当一个桥梁，连接各种虚拟网络设备
+>
+>Docker容器之间的连接，OVS，OpenStac的连接都是使用veth-pair技术
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200814101617604.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2ZhbmppYW5oYWk=,size_16,color_FFFFFF,t_70#pic_center)
+
+
+
+![img](https://img-blog.csdnimg.cn/20200814102155735.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2ZhbmppYW5oYWk=,size_16,color_FFFFFF,t_70#pic_center)
+
+结论：容器之间通过ip地址是可以相互ping通的。tomcat01和tomcat02是共用的一个路由器，docker0
+
+所有容器不指定网络的情况下，都是docker0路由的，docker会给我们的容器分配一个默认可用的IP。
+
+只要容器删除，对应的网桥一对就没有了。
+
+## Link
+
+>思考一个场景，我们编写另一个微服务，database url=ip；如果项目不重启，数据库ip换掉了，我们希望可以处理这个问题，可以按名字来进行访问容器。
+>
+>本质探究：--link就是我们在hosts配置中增加了一个id配置。不过我们现在玩Docker已经不建议使用--link了！
+>
+>我们需要使用的是自定义网络，而不是使用Docker0, 因为它不支持容器名链接访问。
+
+## 自定义网络
+
+Docker 容器互联是指在 Docker 环境中，多个容器之间通过网络进行通信和数据交换的能力。它允许不同的容器相互连接和交互，使得分布式应用和微服务架构更加容易实现。
+
+```
+docker network ls
+# 查看所有的docker网络
+```
+
+网络模式：
+
+- bridge 桥接模式，桥接网络是 Docker 的默认网络模式，也就是上面的docker0，当 Docker 在宿主机上安装时，它会自动创建一个名为 `docker0` 的虚拟网桥（virtual bridge），它**为容器之间的通信提供了一个虚拟网络环境**。通过这个桥接网络，**Docker 容器可以相互通信**并与宿主机进行数据交换。每次启动一个容器，Docker 都会在这个桥接网络上分配一个 IP 地址给容器。不同容器可以通过这个网络相互通信。
+- none  就是不配置网络，一般不会用。
+- host 和宿主机共享网络：在主机网络模式下，容器共享宿主机的网络命名空间，直接使用宿主机的 IP 地址和端口。这种模式适用于需要高性能网络通信的场景，但会带来端口冲突问题。
+- container 容器内网络联通，用的少，局限很大。
+
+```
+docker network create --driver bridge --subnet 192.168.0.0/16 --gateway 192.168.0.1 mynet
+```
+
+### 命令解释
+
+- `docker network create`: 创建一个新的 Docker 网络。
+- `--driver bridge`: 指定网络驱动类型为桥接（默认类型）。
+- `--subnet 192.168.0.0/16`: 指定新的docker网络的子网范围。
+- `--gateway 192.168.0.1`: 指定网络的网关。
+- `mynet`: 自定义网络的名称
+
+假设我们有一个子网 `192.168.0.0/16`，在这个子网内，子网是一个 IP 地址范围，表示在这个网络中可用的 IP 地址集合：
+
+- **网络地址（192.168.0.0）**：标识整个子网，相当于小区的名字“绿色花园小区”。
+- **广播地址（192.168.255.255）**：用于向子网内所有设备发送广播消息，相当于小区的公告板或喇叭广播。
+- **网关地址（192.168.0.1）**：子网内设备与外部通信的出入口，相当于小区的大门。
+- **普通IP地址（192.168.0.2）**：分配给网络中的某个设备，相当于小区中的2号房，住着某一户家庭。
+
+### 验证网络配置
+
+创建网络后，可以使用以下命令查看新创建的网络配置：
+
+```
+docker network inspect mynet
+```
+
+个命令将显示有关 `mynet` 网络的详细信息，包括其子网、网关、连接的容器等。
+
+### 使用自定义网络启动容器
+
+你可以使用这个自定义网络启动容器：
+
+```
+bash
+docker run -d --name container1 --network mynet busybox top
+docker run -d --name container2 --network mynet busybox top
+```
+
+启动后，这些容器将连接到 `mynet` 网络，并根据网络配置获取 IP 地址。
+
+| 特性         | `docker0` 默认网络         | 自定义网络                         |
+| ------------ | -------------------------- | ---------------------------------- |
+| **创建**     | Docker安装时自动创建       | 用户手动创建                       |
+| **子网范围** | 通常是 `172.17.0.0/16`     | 用户可自定义，如 `192.168.0.0/16`  |
+| **网关地址** | 自动设置                   | 用户可自定义，如 `192.168.0.1`     |
+| **隔离性**   | 所有容器共享同一个默认网络 | 不同自定义网络间隔离               |
+| **灵活性**   | 配置固定                   | 可指定子网、网关、网络驱动等参数   |
+| **DNS解析**  | 支持，通过容器名访问       | 支持，通过容器名访问               |
+| **适用场景** | 简单应用和默认配置         | 复杂应用、分布式系统、网络隔离需求 |
+
+## 网络联通
+
+在使用 Docker 时，如果你需要让一个容器能够与其他网络上的容器进行通信，可以使用 `docker network connect` 命令来将容器连接到一个或多个网络。
+
+![](C:\Users\simon.cheng\Documents\ReviewCenter\Docker\Docker-1\containernet.png)
+
+# Docker Compose
+
+
+
+# Docker Swarm
+
+
+
+# CI/CD 之Jenkins
+
+
 
 ## Docker Compose & Kubernetes
 
