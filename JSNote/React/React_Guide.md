@@ -124,7 +124,7 @@ var sayHi = function() {
 
 一个普通函数，可以传入数据，用相同的方法对不同的数据进行处理；而回调函数相当于在函数中传入一个算法（函数），用不同的算法对相同的数据进行处理。
 
-当函数作为参数被调用的时候，实际上就是将调用此函数的引用传递（指针）给了此参数，在函数内部需要被执行的地方再次调用此函数。因此称之为回调函数。
+**当函数作为参数被调用的时候，实际上就是将调用此函数的引用传递（指针）给了此参数，在函数内部需要被执行的地方再次调用此函数。因此称之为回调函数**。
 
 ```
 function doSomethingAsync(callback) {
@@ -227,7 +227,7 @@ function App() {
 }
 ```
 
-> There should be have something followed after return keyword, can't restart a new line and without any code after return, or it will be unreachable because JavaScript would automatically add semicolon after return keyword, which result in unreachable or unreadable code.
+> There should be something followed after return keyword, can't restart a new line and without any code after return, or it will be unreachable because JavaScript would automatically add semicolon after return keyword, which result in unreachable or unreadable code.
 
 ## Dynamical value
 
@@ -581,13 +581,37 @@ export default App;
 
 ```
 
-# useEffect
+# useEffect-副作用
 
-If update the state in an async function in a component, once state updated, the function component will be re-executed again,  and then the async function will be re-executed again after the component is executed, and then the state is updated, and then the function component, which results in the infinite loop. 
+>组件函数不可以被转换为async 函数，因为react不允许这样做，原因在于，React 需要同步渲染组件树，如果组件函数是异步的，会破坏这种同步性。但是可以在组件函数里面写async函数的。
+>
+>
+>
+>在组件中进行异步操作（如数据获取）时，如果**直接在组件的渲染过程中**调用异步函数，并在异步操作完成后更新状态，可能会导致无限循环渲染。原因是状态更新会触发重新渲染，而重新渲染会再次调用异步操作，从而形成循环==end up with infinite loop。
+>
+>
+>
+>为了避免无限循环，在异步操作中，更新的state，在组件再次渲染之后，不要再次触发相同的异步操作，也就不会形成无限循环。所以如果确保异步操作仅在特定事件（如按钮点击）时触发，而不是在每次组件渲染时，直接调用异步函数，使用async函数其实也是可以的。
+>
+>
+>
+>所以 **useEffect** 钩子派上用场. 这样组件首先渲染，然后在useEffect调用异步api，无论是否改变了state，页面是否会被重新渲染，只要依赖项不改变，那么这个异步函数就不会再次被调用，那么也不会造成无限循环。其实也是确保**异步操作仅在特定条件下触发或调用**，而不是在每次组件渲染时都触发。
+>
+>useEffect(() => {
+>
+>,[]})
+>
+>**允许我们在组件渲染之后执行，可以确保异步函数只在需要时调用，从而避免无限循环**
+>
+>如果我们不使用 `useEffect` 钩子，而是等待异步函数操作完成后再渲染页面，理论上是可行的，但实际操作中可能并不理想。这样做会导致一些问题，特别是用户体验和代码维护方面的问题。
+>
+>组件内部直接等待异步操作完成再渲染页面，会导致用户界面（UI）在数据加载完成之前无法渲染。用户会看到一个空白或静态页面，直到数据加载完成，这会严重影响用户体验。
+>
+>定义依赖数组控制effect function 何时执行，其实也就是一个控制条件而已, 确保异步操作仅在特定条件下触发或调用。
 
 we would use the effect to solve an infinite loop. use effect needs two arguments, and the first argument is a function(usually an anonymous function) that should warp your side effect code, and the second argument is an array of dependencies of that effect function.
 
-The idea behind useEffect is that this function which you pass as a first argument to useEffect **will be executed by React after every component execution**. If the second argument is an empty array , the effect function would **only execute once**. if you define the dependencies array, then React will take a look at the dependencies specified there, and it will only execute this effect function again if the dependency values changed. If you omit the array, will cause an infinite loop.
+The idea behind useEffect is that this function which you pass as a first argument to useEffect **will be executed by React after every component execution**. If the second argument is an empty array, the effect function would **only execute once**. if you define the dependencies array, then React will take a look at the dependencies specified there, and it will only execute this effect function again if the dependency values change. If you omit the array, will cause an infinite loop.
 
 ```
 import React, { useState, useEffect } from 'react';
@@ -640,11 +664,11 @@ export default Example;
 
 # Context API
 
-如果一些数据，不仅仅是在单个组件里面需要的数据，在其他一些组件当中也需要用到的话，那就要在一个很高级别的父组件中进行管理，这也叫 lifting state up，比如app组件，因为该组件可以通过调用其他组件的属性传递共享数据。当然我们可以在app组件里管理上下文，但意味着我们会写很多code在app组件当中，这通常不是我们想看到的，因此我们通常使用上下文特性以更通用的集中方式管理。
+如果一些数据，不仅仅是在单个组件里面需要的数据，在其他一些组件当中也需要用到的话，那就要在一个很高级别的父组件中进行管理，这也叫 lifting state up，比如app组件，因为该组件可以通过调用其他组件的属性传递共享数据。当然我们可以在app组件里管理这些共享数据，但意味着我们会写很多code在app组件当中，这通常不是我们想看到的，因此我们通常使用上下文特性以更通用的集中方式管理。
 
 上下文特性允许我们以一种可重用的方式，将数据传播到所有需要它的组件当中。
 
-1. Commonly create a  store folder under src for context management, this is just a convention, because we can think it as state store for the entire application ，and then create a file called a component name under this folder as you like, such as CartContext.jsx.
+1. Commonly create a store folder under src for context management, this is just a convention because we can think it as a state store for the entire application， and then create a file called a component name under this folder as you like, such as CartContext.jsx.
 2. The Context feature offered by React in the end allows us to spread data into all the components that need it in a very easy and reusable way. 
 3. but it is just about spreading data to components, not about changing any values and triggering any component updates. 当然传播的数据可以是有状态的，因此应该由context provider component来管理不断变化的数据。 所以如果我们在上下文provider里面，包含着触发状态更新的动作，并且何种动作对应如何更新状态。那么这样我们就可以将状态更新也进行传递，传递到其他的components当中。
 4. 使用createContext创建的上下文是一个对象，具有provider属性。这个provider属性是一个可以输出的component，并且其component中间应包含需要访问此上下文的所有其他组件，这样创建的这个上下文就可以应用在其他的组件当中了。
@@ -709,13 +733,11 @@ function App() {
 }
 ```
 
-# useReducer 
+# useReducer  **/juːz rɪˈdjuːsər/**
 
-### 见example，使用state减法器
+useReducer, 其实就是一个state减法器，是一个更通用和灵活的状态管理工具。如果我们在context中，管理要分享出去的state，以及state更新函数，是一个很复杂的事情。这样导致上下文组件函数有点难以阅读。我们可以使用React提供的另一个状态管理的钩子useReducer ，而不是再使用useState管理状态。
 
-如果我们在context中，管理要分享出去的state，以及state更新函数，是一个很复杂的事情。这样导致上下文组件函数有点难以阅读。我们可以使用React提供的另一个状态管理的钩子useReducer ，而不是再使用useState管理状态。
-
-1. A function that reduce one or more complex values to a simpler one. 比如通过将[5,10,100]这些数字相加，将一个数字数组减少为一个数字，以达到状态的管理目的。
+1. A function that reduces one or more complex values to a simpler one. 比如通过将[5,10,100]这些数字相加，将一个数字数组减少为一个数字，以达到状态的管理目的。
 
 2. useReducer hook, which is also provided by react, allows us to manage more complex state. and also make it easier to move that state management logic out.
 
@@ -725,7 +747,7 @@ function App() {
 
 5. it is quite common to receive an object as a value for action, the object also has a ' type ' property.
 
-6. and the idea simply is that we can take a look at this type ,which is part of the incoming action and then run different code for different action types
+6. and the idea simply is that we can take a look at this type, which is part of the incoming action, and then run different code for different action types
 
 7. In the component function when we call useReducer that define how the state should be look like. because you use useReducer by passing your reducer function as a first parameter, you are not calling it, instead you are just passing a pointer at this function to useReducer, and then we pass the initial state value. so the state that should be assumed when this component renders for the first time.
 
@@ -765,7 +787,7 @@ function App() {
 
    
 
-## Redux and useReducer
+# Redux /rɪˈdʌks/
 
 `redux` 是一个用于 JavaScript 应用程序状态管理的库，而 `useReducer` 是 React 中的一个 hook，用于管理局部状态。它们之间存在以下区别：
 
@@ -786,7 +808,7 @@ function App() {
 
 在 React 中，组件卸载后再次加载，使用 `useCallback` 和不使用 `useCallback` 可能会有一些区别，具体取决于组件卸载后的状态和使用方式。
 
-#### 使用 useCallback：
+## 使用 useCallback：
 
 - **组件卸载后重新加载**：如果在组件卸载后重新加载，使用 `useCallback` 返回的函数引用可能会保持不变，取决于其依赖项。
 
@@ -804,7 +826,7 @@ function App() {
   
   ```
 
-#### 不使用 useCallback：
+## 不使用 useCallback：
 
 - **组件卸载后重新加载**：如果组件卸载后重新加载，未使用 `useCallback` 的函数引用会重新创建，即使函数逻辑相同也会创建新的引用。
 - **每次重新加载都创建新函数**：在每次重新加载时都会创建新的函数引用，除非函数逻辑或声明发生了变化。
@@ -818,17 +840,25 @@ function App() {
 
 The idea behind building custom Hooks is always to wrap and reuse code that goes into your component functions.
 
-自定义钩子函数的特点是它们可以使用React的Hooks API，比如 `useState`、`useEffect` 等。而自定义的标准函数是不可以
+自定义钩子函数的特点是它们可以使用React的Hooks API，比如 `useState`、`useEffect` 等。而自定义的标准函数是不可以的。
 
 自定义钩子函数的命名通常以 "use" 开头，例如 `useCustomHook`。
+
+通过这种方式，它提供了一种有效的方式来组织和重用React组件中的复杂逻辑。这些自定义Hook可以被多个组件复用，使得组件之间的逻辑关联更加清晰和可维护。
+
+React的函数组件和类组件之间的一个重要区别是，函数组件通过Hooks API可以使用和管理状态，以及在组件生命周期内执行副作用。这使得函数组件能够拥有类似于类组件的功能，同时保持代码简洁和逻辑清晰。
 
 # Tricks
 
 > 在 React 中，给列表元素提供一个唯一的标识是为了帮助 React 有效地更新 DOM。这个唯一的标识通常使用 `key` 属性来指定。虽然不是绝对必需，但是在使用列表渲染时，给每个列表项提供一个唯一的 `key` 通常是一个良好的实践。
 
+
+
 >template literal feature provided by JS by using backticks, which allow us to create a string where parts of that string are dynamic.在模板字符串中，`${}` 包裹的部分表示需要被解析和替换的表达式
 >
 >`string text ${expression} string text`
+
+
 
 > strickMode, every component gets rendered twice by react during development to help us catch potential bugs and errors
 
