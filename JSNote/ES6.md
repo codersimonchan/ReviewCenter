@@ -6,7 +6,7 @@
 
 [ES6 入门教程](https://es6.ruanyifeng.com/)
 
-# 1简介
+# 1. 简介
 
 ES6， 全称 **ECMAScript 6.0** ，是 JavaScript 的下一个版本标准，2015.06 发版。
 
@@ -1325,5 +1325,4 @@ numbers.next(); // { value: 3, done: false }
 ```
 
 每次执行 yield 时，返回的值变为迭代器的下一个值。
-
 

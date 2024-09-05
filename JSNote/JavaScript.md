@@ -2708,15 +2708,34 @@ alert(num.toString().length);
 
 # 类
 
-通过以下简单的3行代码，就可以创建一个类
+**构造函数 (`constructor`)**:
+
+- `constructor` 是一个特殊的方法，用于在创建类的实例时初始化对象。
+- 每个类只能有一个构造函数。如果在一个类中有多个构造函数，会抛出语法错误。
+
+**实例方法**:
+
+- 定义在类内部的方法，这些方法可以被类的实例调用。
+
+**静态方法 (`static`)**:
+
+- 使用 `static` 关键字定义的静态方法，可以直接通过类调用，而不是通过实例调用。
+
+**继承 (`extends`)**:
+
+- 使用 `extends` 关键字可以创建一个类，它继承另一个类的属性和方法。
+
+**访问控制 (`private` 和 `public`)**:
+
+- JavaScript 中可以使用 `#` 符号来定义私有字段和方法。
 
 ```
 class Person {
   //构造器方法
   constructor(name,age){
   //构造器中this指的是类的实例对象，看new的是谁
-  	 this.name = name
-  	 this.age = age
+  	 this.name = name  //this.name 将传入的 name 参数赋值给实例的 name 属性
+  	 this.age = age   //this.age 将传入的 age 参数赋值给实例的 age 属性
   }
 }
 
@@ -2725,3 +2744,4 @@ const p1 = new Person('tom',18)
 const p2 = new Person('jerry',19)
 ```
 
+在继承中，如果子类定义了 `constructor`，则必须在子类的 `constructor` 中调用 `super()`，以确保父类的构造函数先被调用。这是为了确保子类的对象能够继承父类的属性和方法，并且可以正确初始化。

@@ -4,7 +4,7 @@
 
 ## 基本概念
 
-当我们发布一个项目的时候，可不可以**带上环境一起进行打包**呢，这样的话就可以保证在任何环境中都可以运行（从windows到docker）。Docker可以将操作系统，运行时环境，第三方软件库和依赖包，以及环境变量，配置文件，启动命令等打包在一起，以便在任何环境中都可以正确地运行。那么只要在开发环境中运行成功了，那么在测试环境以及生产环境一定也是运行成功的。
+当我们发布一个项目的时候，可不可以**带上环境一起进行打包**呢，这样的话就可以保证项目在任何环境中都可以运行（从windows到docker）。Docker可以将操作系统，运行时环境，第三方软件库和依赖包，以及环境变量，配置文件，启动命令等通通打包在一起，以便在任何环境中都可以正确地运行。那么只要在开发环境中运行成功了，那么在测试环境以及生产环境一定也是运行成功的。
 
 传统：开发人员准备jar，运维来部署
 
@@ -46,13 +46,13 @@ Vmware，Virtalbox，Parallels desktop等虚拟机，是将一台物理服务器
 
 ### 容器和虚拟机的区别
 
-Docker只是容器的一种实现，是一个容器化的解决方案和平台。而容器是一种虚拟化技术，和虚拟机类似，也是一个独立的环境，可以在这个环境中运行应用程序，和虚拟机不同的是，它并**不需要在容器中运行一个完整的操作系统**，而是使用宿主机的操作系统，所以启动速度非常快。同时因为运行需要的资源更少，所以在一台物理服务器上可以运行更多的容器。
+Docker只是容器的一种实现，是一个容器化的解决方案和平台。而容器是一种虚拟化技术，和虚拟机类似，也是一个独立的环境，可以在这个环境中运行应用程序，和虚拟机不同的是，它并**不需要在容器中运行一个完整的操作系统**，而是使用**宿主机的操作系统**，所以启动速度非常快。同时因为运行需要的资源更少，所以在一台物理服务器上可以运行更多的容器。
 
 ![image-20231204204927494](C:\Users\simon.cheng\AppData\Roaming\Typora\typora-user-images\image-20231204204927494.png)
 
 ### 基本概念
 
-Docker 是基于Go语言开发的，开源项目。
+Docker 是基于Go语言开发的开源项目。
 
 官网： https://www.docker.com/
 
@@ -66,7 +66,7 @@ Docker 是基于Go语言开发的，开源项目。
 
 > Docker 仓库： 是用来存储docker镜像的地方，最流行的仓库就是DockerHub
 
-Docker 是使用Client-Server架构模式，Docker Client和Docker Daemon之间通过Socket或者RESTful API进行通信，Docker Daemon就是服务端的守护进程，他负责管理Docker的各种资源。Docker Client负责向Docker Daemon发送请求，Docker Daemon接收请求之后进行处理，然后将结果返回给Docker Client，这里的Docker Daemon是一个后台进程，所以我们在终端中输入的各种Docker 命令，实际上都是通过Docker客户端发送给Docker Daemon的。然后Docker Deamon再进行处理，最后再将结果返回给客户端。然后就可以在终端中看到执行结果了。
+Docker 是使用Client-Server架构模式，Docker Client和Docker Daemon之间通过Socket或者RESTful API进行通信，Docker Daemon就是服务端的守护进程，他负责管理Docker的各种资源。Docker Client负责向Docker Daemon发送请求，Docker Daemon接收请求之后进行处理，然后将结果返回给Docker Client，这里的Docker Daemon是一个后台进程，所以我们在终端中输入的各种Docker 命令，实际上都是通过Docker客户端发送给Docker Daemon的。然后Docker Daemon再进行处理，最后再将结果返回给客户端。然后就可以在终端中看到执行结果了。
 
 ![image-20231204211214828](C:\Users\simon.cheng\AppData\Roaming\Typora\typora-user-images\image-20231204211214828.png)
 
@@ -76,6 +76,7 @@ Docker 是使用Client-Server架构模式，Docker Client和Docker Daemon之间�
 
 ```
 cat /etc/os-release
+
 //the info about the linux system.
 NAME="CentOS Linux"
 VERSION="7 (Core)"
@@ -226,11 +227,10 @@ docker run -d -p 8080:80 --name my-nginx -v /my/local/content:/usr/share/nginx/h
 
 解释：
 
-- `-d`：在后台运行容器。在 Docker 中，后台运行容器指的是以守护进程（daemon）模式运行容器，使其在后台运行，不会阻塞终端。这样你可以继续在终端执行其他命令，而容器在后台继续运行。
-- 
-- `-p 8080:80`：将主机的 8080 端口映射到容器的 80 端口。
-- `--name my-nginx`：为容器指定名称 `my-nginx`。
-- `-v /my/local/content:/usr/share/nginx/html`：将主机的目录 `/my/local/content` 挂载到容器的 `/usr/share/nginx/html` 目录。
+- `-d`：在后台运行容器。如果你不使用 `-d`，容器会在前台运行，并将其输出直接显示在当前的终端上。让其在后台运行，不会阻塞终端。这样的话，你可以继续在终端执行其他命令，而容器在后台继续运行。
+- `-p 8080:80`：将主机的 8080 端口映射到容器的 80 端口。先主-后容
+- `--name my-nginx`：为容器指定名称 `my-nginx`
+- `-v /my/local/content:/usr/share/nginx/html`：将主机的目录 `/my/local/content` 挂载到容器的 `/usr/share/nginx/html` 目录。先主-后容
 - `-e NGINX_HOST=myhost` 和 `-e NGINX_PORT=80`：设置环境变量 `NGINX_HOST` 和 `NGINX_PORT`。
 - `nginx`：使用 `nginx` 镜像。
 
@@ -288,8 +288,8 @@ docker cp b8453025116：home/test.jave /home
 
 ```
 # pull the images
-docker pull ngin
-# 将容器内80端口，映射给宿主机3344端口，这意味着你可以通过访问主机的 3344 端口来访问容器中运行的 Nginx 服务
+docker pull nginx
+# 将容器的80端口，映射给宿主机3344端口，这意味着你可以通过访问主机的3344端口来访问容器中运行的 Nginx 服务
 docker run -d --name nginx01 -p 3344:80 nginx (将容器内80端口，映射给服务器3344端口)
 # check docker contianer
 docker ps
@@ -318,7 +318,7 @@ docker exec -it tomcat01 /bin/bash
 
 ```
 
-思考问题：如果以后要部署项目，如果每次都进入容器是不是十分麻烦，我要是可以在容器外部提供一个映射路径，webapps，我们在外部防止项目，就自动同步到内部就好了。
+思考问题：如果以后要部署项目，如果每次都进入容器是不是十分麻烦，我要是可以在容器外部提供一个映射路径，让我们在可以在外部放置项目就自动同步到内部，这样就是一个很好的方案。
 
 **可视化**
 
@@ -337,9 +337,9 @@ docker exec -it tomcat01 /bin/bash
 
 # Docker 镜像讲解
 
-镜像是一种轻量级，可执行的独立软件包，用来打包润建运行环境和基于运行环境开发的软件，它包含运行某个软件所需要的所有内容，包括代码、运行时，库，环境变量和配置文件。
+镜像是一种轻量级，可执行的独立软件包，用来打包运行环境和基于运行环境开发的软件，它包含运行某个软件所需要的所有内容，包括代码、运行时，库，环境变量和配置文件。
 
-所有的应哟个，直接打包成docker镜像，就可以直接跑起来。
+所有的应用，直接打包成docker镜像，就可以直接跑起来。
 
 如何得到镜像：
 
@@ -347,7 +347,7 @@ docker exec -it tomcat01 /bin/bash
 
 朋友copy给你
 
-自己制作一个镜像DockerFile
+自己制作一个镜像Docker File
 
 ## 镜像原理之联合文件系统
 
@@ -377,7 +377,7 @@ docker commit -m="提交的描述信息" -a="作者" 容器id 目标镜像名：
 ```
 1.启动一个默认的tomcat
 2.发现这个默认的tomcat是没有webapps应用，官方的镜像默认webapps下面是没有文件的。
-3.我自己拷贝进了进本文件
+3.我自己拷贝进了文本文件
 4.然后将修改过的容器提交为一个新的镜像，这样我们就可以直接使用我们修改过的镜像即可。
 docker commit -m='' -a='' 7e119b82cff6 tomcat02:1.0
 这样repository里面就有一个名为tomcat02，TAG为1.0的镜像。
@@ -393,7 +393,7 @@ docker commit -m='' -a='' 7e119b82cff6 tomcat02:1.0
 
 这就是卷技术，目录的挂载，将我们容器内的目录，挂载到Linux上面。
 
-总结：容器的持久化和同步操作！荣期间也是可以数据共享的。
+总结：容器的持久化和同步操作！容器间也是可以数据共享的。
 
 ### 使用数据卷
 
@@ -479,7 +479,7 @@ CMD /bin/bash
 
 容器之间配置信息的传递，数据卷生命周期一直持续到没有容器使用位置。但是一旦你持久化到了本地，这个时候本地的数据是不会删除的。
 
-## 构建步骤
+## 构建images步骤
 
 ```
 编写一个dockerfile 文件
@@ -540,6 +540,14 @@ Docker Hub 中99%的镜像都是从scratch开始的，然后配置需要的软�
 
 # Dokcer网络
 
+网络接口（大楼地址）：每个服务器（计算机）可以有一个或多个网络接口（IP地址），这些接口将服务器连接到不同的网络（类似于大楼可以有多个入口，每个入口都连接到不同的街道或区域）。
+
+服务端口（住户地址）：每个网络接口可以提供多个服务，每个服务在一个特定的端口上运行。端口号就像门牌号，标识了具体的服务。比如：
+
+​    HTTP服务通常使用端口 80。
+​    HTTPS服务通常使用端口 443。
+​    SSH服务通常使用端口 22。
+
 >我们发现这个容器带来的网卡，都是一对对的。
 >
 >veth-pair 就是一堆的虚拟设备接口，他们都是成对出现的，一端连着协议，一段彼此相连。
@@ -554,7 +562,7 @@ Docker Hub 中99%的镜像都是从scratch开始的，然后配置需要的软�
 
 ![img](https://img-blog.csdnimg.cn/20200814102155735.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2ZhbmppYW5oYWk=,size_16,color_FFFFFF,t_70#pic_center)
 
-结论：容器之间通过ip地址是可以相互ping通的。tomcat01和tomcat02是共用的一个路由器，docker0
+结论：容器之间通过ip地址是可以相互ping通的。tomcat01和tomcat02是共用的一个路由器docker0，
 
 所有容器不指定网络的情况下，都是docker0路由的，docker会给我们的容器分配一个默认可用的IP。
 
@@ -661,3 +669,28 @@ Docker Compose 和 Kubernetes 是用于管理容器化应用程序的两种不�
 - Kubernetes 更适用于大规模容器集群的管理，具有高可用性、弹性伸缩、自动化部署等强大功能，适合于生产环境中的复杂应用。
 
 在某些情况下，可以将 Docker Compose 结合 Kubernetes 使用，例如可以在开发阶段使用 Docker Compose 进行本地开发和测试，然后在部署到生产环境时使用 Kubernetes 进行容器编排和管理。
+
+
+
+[ Bitbucket Pipeline ] --> [ Docker 镜像 ] --> [ Docker Registry ]
+                                                |
+                                                v
+                                        [ Kubernetes 集群 ]
+                                          /      |       \
+                                         /       |        \
+                                [ 应用实例1 ]  [ 应用实例2 ]  [ 应用实例3 ]
+
+
+
+开始：开发人员将代码推送到 Bitbucket 仓库。
+Bitbucket Pipeline 自动触发：就像启动了一条生产线，会自动开始运行，处理你的代码
+
+> 拉取代码、在生产线的初步阶段，代码会被编译和构建，就像是将原材料加工成半成品
+>
+> 运行测试、接下来，代码会经过各种测试，类似于在生产线上进行质量检查，确保半成品符合标准
+>
+> 打包：测试通过后，代码会被打包成最终的产品，就像在生产线上进行包装, 构建 Docker 镜像。
+>
+> 将最终产品送到仓库或分销中心。推送 Docker 镜像到 Docker Registry（如 Docker Hub 或私有仓库）就像是将最终产品存储起来，准备发布或分发
+
+**Kubernetes在CI/CD中的作用**主要是在构建完成后，负责容器的部署、管理和维护，确保应用程序能够稳定、可靠地运行在生产环境中。它是将通过CI/CD流程生成的Docker镜像转化为实际可用的服务的重要组成部分。

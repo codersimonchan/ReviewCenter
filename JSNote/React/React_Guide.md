@@ -272,7 +272,7 @@ Children is a prop that is not set with help of component attributes like others
 
 ![image-20231101183507457](C:\Users\simon.cheng\AppData\Roaming\Typora\typora-user-images\image-20231101183507457.png)
 
-## React Responding to Events
+## React Responding to Events（箭头函数）
 
 In react, you could **add event listeners** to elements by adding a special attribute or called props to those HTML elements. Those HTML  elements (Native HTML elements) support many on-something props, such as 'onClick'. and value you should provide for any event should be a function. Then we can define this function.  
 
@@ -364,19 +364,24 @@ export default function Section({title, children, ...props}) {//收集参数到j
 }
 ```
 
-## Updating State Based On Old State
+## Updating State Based On Old State（箭头函数）
 
 When updating your state based on the previous value of that state, you should pass **a function to that state updating function** instead of that just new state value you wanna have. This is a strong recommendation by the React team.  Because this function which you pass here will be called by react and it **will automatically get the current state value(not updated already) as the input**. That is previous value here as an input. So we could accept a parameter that could be named editing. should then return the new state you wanna set.
 
 主要因为state的更新并不是即时的，所以有时直接更新有可能获取的并不是当前最新状态值。
 
-而使用函数更新会自动从react获取该状态的最新状态值。
+```
+this.setState({ count: this.state.count + 1 });
+this.setState({ count: this.state.count + 1 });
+```
+
+通过传递一个回调函数给 `setIsEditing`，你可以确保状态更新基于最新的状态值：
 
 ![image-20231103084014043](C:\Users\simon.cheng\AppData\Roaming\Typora\typora-user-images\image-20231103084014043.png)
 
 # Update object Immutably
 
-"Immutably" 是 "immutable"（不可变的）一词的副词形式。在编程领域，不可变性是指一旦创建了一个对象，就不要更改其内容或状态。相反，任何修改操作都将返回一个新的对象，而不是直接修改原始对象。
+"Immutably" 是 "immutable"  [ɪˈmjuːtəbl]（不可变的）一词的副词形式。在编程领域，不可变性是指一旦创建了一个对象，就不要更改其内容或状态。相反，任何修改操作都将返回一个新的对象，而不是直接修改原始对象。
 
 In an immutable way, which simply means you create a copy of the old **state object,** so a new object or a new array first. and then you just change that copy instead of that existing object or array. And the reason for that recommendation is that if your state is an object or array, you are dealing with a reference value in JavaScript. And therefore if you update an object or array directly.  You would be updating the old value in-memory immediately. And this can again lead to strange bugs or side effects if you have multiple places in your application that are using that object or array.
 
@@ -406,7 +411,6 @@ const array = [1, 2, 3, 4, 5];
 const removed = array.splice(1, 2); // 从索引 1 的位置开始删除 2 个元素
 console.log(array); // 输出: [1, 4, 5]
 console.log(removed); // 输出: [2, 3] 被删除的元素
-
 ```
 
 如果直接修改了状态，而没有创建新的状态对象，React  就难以判断什么时候进行重新渲染。React在比较状态变化时，通常会比较对象的引用（即内存地址），而不是对象的内容。如果状态对象的引用没有变化，React 可能会认为状态没有发生变化，从而不触发重新渲染。如果对象的引用发生了变化，那么React就会认为state发生了变化，从而触发重新渲染。
@@ -833,7 +837,9 @@ useReducer, 其实就是一个state减法器，是一个更通用和灵活的状
 
 总的来说，`useCallback` 在组件卸载后重新加载时，如果依赖项保持不变，函数引用可能会保持一致。而不使用 `useCallback` 的情况下，函数引用会在每次重新加载时都重新创建。
 
-# Custom Hooks
+# 自定义钩子
+
+useEffect，useState都是定义好的hook。
 
 - Only call hooks inside of component functions, and you may also use them inside of other Hooks.
 - Only call Hooks on the top level in component functions, must not nested in if statements or nested functions or loops.
