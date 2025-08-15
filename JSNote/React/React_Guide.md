@@ -4,11 +4,27 @@
 
 **J**avaScript **S**yntax e**X**tension, this extension allows developers to describe and create HTML elements by writing HTML markup code inside of JavaScript files. With React, you write declarative code(声明式编程)， which means you define the target HTML structure component, and don't have to handle DOM directly.  Only care what to do, don't have to worry how to do. For example, SQL is also declarative code. But JSX is a feature that's not supported by browsers. So before it reaches the browser, It's transformed behind the scenes(ReactDOM will be responsible for outputting those components' content on the screen) to code that does work in the browser.
 
-Vite is a modern build tool used for web development, Vite can transform JSX (JavaScript XML) code. Vite is designed to handle JSX syntax commonly used in React applications. It has built-in support and configurations that allow developers to write JSX code directly within their Vue.js or React projects. That is why we could write JSX files even without Babel in the overall project.
+Vite is a modern build tool used for web development, Vite can transform JSX (JavaScript XML) code. Vite is designed to handle JSX syntax commonly used in React applications. It has built-in support and configurations that allow developers to write JSX code directly within their Vue.js or React projects. That is why we could write JSX files without Babel in the overall project.
+
+> JSX 的特点
+>
+> 1 **类 HTML 语法**： JSX 看起来像 HTML，但它实际上是 JavaScript 的一种语法扩展。在 React 应用中，使用 JSX 编写的标签会被编译成标准的 JavaScript 函数调用，如 const element = <h1>Hello, world!</h1>; 会被编译为const element = React.createElement('h1', null, 'Hello, world!');
+>
+> 2 JSX 支持将 HTML 属性映射到 React 组件的 props 中。属性名可以与 HTML 相同，但有些属性（如 `class`）在 JSX 中需要用 React 规范（如 `className`）来书写
+>
+> 3 JSX 不能直接在浏览器中运行，需要通过 Babel 等工具将其编译成普通的 JavaScript 函数。例如，上述的 JSX 代码会被编译成标准的 `React.createElement` 调用
+>
+> 为什么使用JSX
+>
+> **可读性**：使用类似 HTML 的语法让代码更直观，特别是在构建复杂的用户界面时。
+>
+> **组件化开发**：它非常适合 React 组件化开发模式，能够更好地将视图逻辑与界面结构结合。
+>
+> **增强开发体验**：JSX 更简洁，易于编写和维护，同时拥有与 JavaScript 完全相同的能力和动态性。
 
 # Destructing Assignment
 
-Destructing in JavaScript is a convenient way to extract values from objects or arrays and assign them to variables using a syntax that looks similar to the structure being extracted. It allows you to unpack  values from arrays or properties from objects into distinct variables. It's a powerful feature used for various purposes like copying arrays,  merging arrays, passing function arguments, and creating shallow copies of objects.
+Destructing in JavaScript is a convenient way to extract values from objects or arrays and assign them to variables using a syntax that looks similar to the structure being extracted. It allows you to unpack values from arrays or properties from objects into distinct variables. It's a powerful feature used for various purposes like copying arrays,  merging arrays, passing function arguments, and creating shallow copies of objects.
 
 是一种在 JavaScript 中从数组或对象中提取数据并赋值给变量的语法
 
@@ -26,25 +42,27 @@ const { name, age, city } = person;
 
 # Spread Operator
 
-The spread operator (`...`) in JavaScript is a syntax that  allows an iterable (such as an array, string, or object expressions) to  be expanded or spread **into individual elements** or key-value pairs. 
+The spread operator (`...`) in JavaScript is a syntax that allows an iterable (such as an array, string, or object expressions) to  be expanded or spread **into individual elements** or key-value pairs. 
 
-## Array Spread
+## Array Spread 数组中的使用
+
+将数组的元素展开为独立的值
 
 ```
 const numbers = [1, 2, 3];
 const newNumbers = [...numbers, 4, 5];
 
-In this example, the ...numbers syntax spreads the elements of the numbers array into individual elements, which are then included in the newNumbers array.扩展运算符只会对对象的第一层进行拷贝，而不会递归地拷贝嵌套的对象。这就导致了属性的子对象仍然共享相同的引用。
+const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+const combined = [...arr1, ...arr2];
 
-结论：
-    扩展运算符（spread operator）会创建对象的浅拷贝。
-    对象属性如果是引用类型（如对象或数组），那么它们的引用仍然是共享的，这就是浅拷贝的特性。
-    深拷贝需要递归地拷贝对象的所有层级，可以使用 JSON.parse(JSON.stringify()) 或 lodash 的 cloneDeep。
-    
-    JSON.stringify() 是一个 JavaScript 方法，用于将 JavaScript 对象或值转换为 JSON 字符串。它通常与 JSON.parse() 一起使用，后者用于将 JSON 字符串转换回 JavaScript 对象。
-    
-    JSON.parse() 是一个 JavaScript 方法，用于将 JSON 字符串解析为 JavaScript 对象。它通常与 JSON.stringify() 一起使用，后者用于将 JavaScript 对象转换为 JSON 字符串。
+console.log(combined);  // Output: [1, 2, 3, 4, 5, 6]
+
 ```
+
+## 在函数调用中的使用
+
+展开数组中的元素，传递为函数的参数列表。
 
 ```
 function sum(a, b, c) {
@@ -56,11 +74,13 @@ console.log(sum(...numbers));  // Output: 6
 
 ```
 
+## **在对象中的使用**
+
 ## Object Spread (Shallow Copy):
 
-浅拷贝 shallow copy， 生成一个新的对象。不和原来的对象引用一个地址
+展开对象的属性，常用于对象合并或克隆。
 
-When used with objects, the spread operator creates a shallow copy of  the original object. It copies enumerable properties from one object  into a new object.
+如果属性重复，后面的值会覆盖前面的值：
 
 ```
 const person = { name: 'John', age: 30 };
@@ -68,18 +88,21 @@ const copiedPerson = { ...person };
 
 console.log(copiedPerson);  // Output: { name: 'John', age: 30 }
 
+const obj1 = { a: 1, b: 2 };
+const obj2 = { b: 3, c: 4 };
+const combined = { ...obj1, ...obj2 };  // { a: 1, b: 3, c: 4 }
 ```
 
-## Concatenating Arrays
+结论：
+    扩展运算符（spread operator）会创建对象的浅拷贝。
+    对象的属性如果是引用类型（如对象或数组），它们还是会共享相同的引用地址。
+    深拷贝需要递归地拷贝对象的所有层级，可以使用 JSON.parse(JSON.stringify()) ,但这种方法对于带有函数或不可序列化属性的对象不适用。更全面的方法是使用 lodash 的 _.cloneDeep() 或者现代框架中提供的深拷贝工具。
 
-```
-const arr1 = [1, 2, 3];
-const arr2 = [4, 5, 6];
-const combined = [...arr1, ...arr2];
-
-console.log(combined);  // Output: [1, 2, 3, 4, 5, 6]
-
-```
+    简单来说，浅拷贝会让第一层级的属性引用地址变化，而深拷贝则会递归地让所有层级的属性引用地址都独立。
+    
+    JSON.stringify() 是一个 JavaScript 方法，用于将 JavaScript 对象或值转换为 JSON 字符串。它通常与 JSON.parse() 一起使用，后者用于将 JSON 字符串转换回 JavaScript 对象。
+    
+    JSON.parse() 是一个 JavaScript 方法，用于将 JSON 字符串解析为 JavaScript 对象。它通常与 JSON.stringify() 一起使用，后者用于将 JavaScript 对象转换为 JSON 字符串。
 
 ## Rest Operator
 
@@ -106,6 +129,7 @@ function sayHello() {
 }
 ```
 
+**函数表达式** 有等号
 ```
 // This won't work due to hoisting limitations with function expressions
 sayHi(); // Error: sayHi is not a function
@@ -162,35 +186,30 @@ doSomethingAsync((errs) => {
 
 当您将一个函数作为参数传递给另一个函数时，实际上是将函数的引用（指向函数在内存中的地址）传递给了该函数，而不是将函数的执行结果传递给了该函数。换句话说，函数参数接收到的是一个函数的指针，它指向内存中存储的函数代码，而不是实际的函数执行结果。函数作为参数传递时，传递的是函数的引用，而不是函数的执行结果。这意味着被传递的函数可以在**接收到参数的函数内部根据需要被调用**，而不是在传递时立即执行。
 
-```
-function doSomethingAsync(callback) {
-  setTimeout(() => {// 回调函数1
+# Try...Catch
+
+在 JavaScript 中，`try-catch` 语句用于捕获和处理在代码执行过程中可能发生的异常。使用 `try-catch` 可以防止程序因未处理的异常而崩溃，并允许你在发生错误时执行特定的处理逻辑。以下是一些常见的使用场景：
+
+### 1. 异步操作中的错误处理
+在处理异步操作时，特别是使用 `async/await` 语法时，可以使用 `try-catch` 来捕获和处理可能发生的错误。
+
+```javascript
+async function fetchData() {
     try {
-      // 假设在这里发生了一个错误
-      throw new Error("Something went wrong!");
-    } catch (err) {
-      // 将异常作为参数传递给回调函数
-      callback(err);//回调函数2
-      //console.log(err); //打印函数3
+        const response = await fetch('https://api.example.com/data');
+        const data = await response.json();
+        console.log(data);
+    } catch (error) {
+        console.error('Error fetching data:', error);
     }
-  }, 1000);
 }
 ```
 
-1. 当调用 `doSomethingAsync` 函数时，其被加入执行栈。
-2. 一秒钟后，定时器到期，回调函数1 被添加到任务队列中，在doSomethingAsync之上。
-3. JavaScript 引擎在调用栈为空时，从任务队列中取出回调函数1 执行。
-4. 在执行回调函数1 中，如果此时抛出一个错误，并被 `try...catch` 块捕获，然后调用 `callback(err)` 这个函数。
-5. `callback(err)` 这个函数被添加到任务队列中。
-6. JavaScript 引擎在调用栈再次为空时（说明回调函数1已经执行结束），从任务队列中取出回调函数2 执行。
-7. 综上可以保证回调函数2在回调函数1之后执行，即使在回调函数1当中，仍然有异步函数，在异步函数中发生了错误，也是异步函数优先进入调用栈，仍然可以保证回调函数2在异步函数发生错误后进行调用。
-8. 如果不使用回调函数2，直接使用console.log，那么就会直接将结果打印在控制台，无法有效利用callback那样，对错误进行处理，但是仍然也是可以这样写的。
-
 # Component
 
-Name starts with uppercase character, Multi-word should be written in CamelCase(e.g."MyHeader"). 
+Name starts with an uppercase character, Multi-word should be written in CamelCase(e.g."MyHeader"). 
 
-The function must return a actual html that can be rendered('displayed on the screen') by React. Remember you're not calling these component like functions yourself in you code, instead you are using them as html elements, and under the hood, React will call the actual functions.
+The function must return an actual HTML that can be rendered('displayed on the screen') by React. Remember you're not calling these components like functions yourself in your code, instead you are using them as HTML elements, and under the hood, React will call the actual functions.
 
 ## Custom Components
 
@@ -231,9 +250,15 @@ function App() {
 
 ## Dynamical value
 
-Outputting dynamic value with **curly braces{}**, but not wrapped by quotes. we can use that same syntax to load our images.
+Outputting dynamic value with **curly braces{}**, allow you to embed any **JavaScript expression** directly inside JSX
 
-import image into JavaScript file is not something you can normally do in JavaScript, but here would work, because of that same build process in React, would also transform it. such as import ".css".
+箭头函数也是一个JS expression，`(e) => errorTypeChange(e)` 是一个**箭头函数表达式**，返回的是 `undefined`。React 允许这种函数表达式作为 `onChange` 的值来触发事件处理。虽然没有明确返回值。
+
+```
+A JavaScript expression is any valid piece of code that produces a value. Expressions can be as simple as a variable name or a literal value (like 5 or "hello"), or they can be more complex, involving calculations, function calls, or logical evaluations
+```
+
+we can use that same syntax to load our images， import image into JavaScript file is not something you can normally do in JavaScript, but here would work, because of that same build process in React, would also transform it. such as import ".css".
 
 ## Making components reusable  with Props
 
@@ -313,6 +338,18 @@ The event handler should pass the event object to the function if you want to ac
 - **直接传递函数引用**：父组件将处理函数的引用传递给子组件，此时无需传递参数，而子组件在适当的时间调用该函数，并传递所需参数。
 - **自定义参数**：如果你需要在事件处理函数中传递自定义参数（例如字符串 `'test'`），则使用箭头函数或闭包函数来封装调用。
 
+# 闭包 closure
+
+### 闭包的工作原理
+
+当一个函数在内部定义了另一个函数，并且内部函数引用了外部函数的变量时，就形成了闭包。即便外部函数已经执行完毕，内部函数仍然能够访问和使用那些变量，因为 JavaScript 引擎会在内存中保留这些变量的引用。
+
+闭包之所以称为“闭包”，是因为它“包住”了创建时的作用域，并允许内部函数在执行时“闭合”或“绑定”这个作用域。这使得即使外部函数已经结束，内部函数依然可以访问和操作它所“包裹”住的环境变量。
+
+### 如果内部函数不引用外部变量，还算闭包吗？
+
+不算！如果内部函数**不引用外部函数的变量**，即使在外部函数中定义了该内部函数，也不会形成闭包。这是因为没有引用外部变量，JavaScript 引擎不需要额外保留外部函数的作用域。
+
 ## Managing State & Hooks
 
 import  { useState } from 'react'
@@ -383,7 +420,7 @@ this.setState({ count: this.state.count + 1 });
 
 "Immutably" 是 "immutable"  [ɪˈmjuːtəbl]（不可变的）一词的副词形式。在编程领域，不可变性是指一旦创建了一个对象，就不要更改其内容或状态。相反，任何修改操作都将返回一个新的对象，而不是直接修改原始对象。
 
-In an immutable way, which simply means you create a copy of the old **state object,** so a new object or a new array first. and then you just change that copy instead of that existing object or array. And the reason for that recommendation is that if your state is an object or array, you are dealing with a reference value in JavaScript. And therefore if you update an object or array directly.  You would be updating the old value in-memory immediately. And this can again lead to strange bugs or side effects if you have multiple places in your application that are using that object or array.
+推荐使用不可变更新的原因是为了**确保 React 能够正确检测到状态变化**，从而触发必要的重新渲染。这种方式不仅能让代码更具可预测性，还可以避免由直接修改状态导致的渲染问题。
 
 利用展开运算符，创建新的对象，是一种shallow copy, 创建了一个新的对象。对于浅拷贝后的对象来说，在第一层级上，新创建的对象与原始对象是独立的，但对于嵌套对象或数组等引用类型的属性，它们还是会共享相同的引用地址。
 
@@ -506,7 +543,7 @@ What is the actual value is ? it is really the actual DOM node. which you could 
 
 
 
-We could connect a ref to HTML element by going to that element,  and add a special 'ref' prop here, just like the 'key' prop, that is a built-in prop which you can add to any HTML element in React. That is to say, you can connect any HTML element to one of your references. You will very often do that for inputs, because you wanna fetch input data, then a connection will be established. 所以当程序运行到引用的ref的时候，它就会将存储在useRef当中的值设置为native DOM 的input节点元素。**简单理解就是将HTML元素关联到一个变量上**。这样在其他的JS代码中，就可以对这个关联的变量监测，或者在发生变化的时候有什么动作。
+We could connect a ref to HTML element by going to that element,  and add a special 'ref' prop here, just like the 'key' prop, that is a built-in prop which you can add to any HTML element in React. That is to say, you can connect any HTML element to one of your references. You will very often do that for inputs, because you wanna fetch input data, then a connection will be established. 所以当程序运行到引用的 ref的时候，它就会将存储在useRef当中的值设置为native DOM 的input节点元素。**简单理解就是将HTML元素关联到一个变量上**。这样在其他的JS代码中，就可以对这个关联的变量监测，或者在发生变化的时候有什么动作。
 
 
 
@@ -591,11 +628,11 @@ export default App;
 >
 >
 >
->在组件中进行异步操作（如数据获取）时，如果**直接在组件的渲染过程中**调用异步函数，并在异步操作完成后更新状态，可能会导致无限循环渲染。原因是状态更新会触发重新渲染，而重新渲染会再次调用异步操作，从而形成循环==end up with infinite loop。
+>在组件中进行异步操作（如数据获取）时，如果**直接在组件的渲染过程中**(组件的生命周期事件中，挂载-更新-卸载的过程)调用异步函数，并在异步操作完成后更新state，可能会导致无限循环渲染。原因是状态更新会触发重新渲染，而重新渲染会再次调用异步操作，从而形成循环==end up with infinite loop。如果用户交互事件是事件驱动的，例如点击按钮触发，就不需要使用useEffect。
 >
 >
 >
->为了避免无限循环，在异步操作中，更新的state，在组件再次渲染之后，不要再次触发相同的异步操作，也就不会形成无限循环。所以如果确保异步操作仅在特定事件（如按钮点击）时触发，而不是在每次组件渲染时，直接调用异步函数，使用async函数其实也是可以的。
+>为了避免无限循环，在**异步操作中，更新state之后**，不要再次触发相同的异步操作，也就不会形成无限循环。所以如果确保异步操作仅在特定事件（如按钮点击）时触发，而不是在每次组件渲染时，直接调用异步函数，使用async函数其实也是可以的。
 >
 >
 >
@@ -603,7 +640,9 @@ export default App;
 >
 >useEffect(() => {
 >
->,[]})
+>},[])
+>
+>
 >
 >**允许我们在组件渲染之后执行，可以确保异步函数只在需要时调用，从而避免无限循环**
 >
@@ -618,41 +657,14 @@ we would use the effect to solve an infinite loop. use effect needs two argument
 The idea behind useEffect is that this function which you pass as a first argument to useEffect **will be executed by React after every component execution**. If the second argument is an empty array, the effect function would **only execute once**. if you define the dependencies array, then React will take a look at the dependencies specified there, and it will only execute this effect function again if the dependency values change. If you omit the array, will cause an infinite loop.
 
 ```
-import React, { useState, useEffect } from 'react';
+示例（⚠️ 错误用法）：
 
-function Example() {
-  const [count, setCount] = useState(0);
-
-  // 声明一个 effect
-  useEffect(() => {
-    // 在组件渲染完成后执行
-    document.title = `You clicked ${count} times`;
-
-    //如果是组件首次加载，首先会执行 useEffect 中的副作用函数, 不会d
-    //当组件重新渲染，并且 useEffect 中的依赖项发生了变化时，React 会先执行清理函数（如果存在），然后再次执行副作用函数。
-    return () => {
-      document.title = 'React App'; // 恢复原始的文档标题
-    };
-  }, [count]); // 仅在 count 发生变化时重新执行
-
-  return (
-    <div>
-      <p>You clicked {count} times</p>
-      <button onClick={() => setCount(count + 1)}>Click me</button>
-    </div>
-  );
-}
-
-export default Example;
+useEffect(() => {
+  fetchData().then(data => {
+    setData(data); // 每次设置 state 导致 re-render，又触发 useEffect -> 无限循环
+  });
+}, [data]); // ⚠️ 错：你不应该监听你刚刚设置的 state 本身
 ```
-
-在这个示例中，我们使用 `useEffect` 来更新文档标题。当组件渲染完成后，`useEffect` 中的 effect 函数会执行，将文档标题设置为当前点击次数。另外，我们传递了一个依赖数组 `[count]`，这意味着 effect 函数仅在 `count` 发生变化时才会重新执行。
-
-当 React 完成对组件的渲染时，会调用 `useEffect` 中的副作用函数。具体来说，`useEffect` 的行为类似于 `componentDidMount` 和 `componentDidUpdate`，它会在组件渲染到屏幕之后执行。通过 `useEffect` 获取异步数据后，再使用状态钩子 (`useState`) 来管理数据状态。
-
-更新页面。
-
-
 
 如果提供了依赖数组，并且其中的依赖项发生了变化，那么 React 会先调用副作用函数的**清理函数**，然后再调用新的副作用函数。执行清理函数之后再执行新的副作用函数的主要目的是确保新的副作用函数执行时处于一个干净的状态。如果不执行清理函数，而是直接执行新的副作用函数，可能会导致之前的副作用产生的一些未清理的状态或资源泄露影响到新的副作用函数的正确执行，例如取消订阅、清除定时器、清除副作用产生的临时数据等。这样可以避免出现未经处理的副作用，从而提高了应用的健壮性。
 
@@ -737,59 +749,92 @@ function App() {
 }
 ```
 
-# useReducer  **/juːz rɪˈdjuːsər/**
+# useReducer  **/rɪˈdjuːsər/**
 
 useReducer, 其实就是一个state减法器，是一个更通用和灵活的状态管理工具。如果我们在context中，管理要分享出去的state，以及state更新函数，是一个很复杂的事情。这样导致上下文组件函数有点难以阅读。我们可以使用React提供的另一个状态管理的钩子useReducer ，而不是再使用useState管理状态。
 
-1. A function that reduces one or more complex values to a simpler one. 比如通过将[5,10,100]这些数字相加，将一个数字数组减少为一个数字，以达到状态的管理目的。
+`useReducer` 是 React 提供的一个 Hook，用于在函数组件中管理复杂的状态逻辑。它是 `useState` 的替代方案，适用于包含多个子值或需要依赖于先前状态的状态更新逻辑。
 
-2. useReducer hook, which is also provided by react, allows us to manage more complex state. and also make it easier to move that state management logic out.
+### `useReducer` 的基本用法
 
-3. useReducer hook needs a reducer function as an input.
+`useReducer` 接受三个参数：
+1. **reducer**：一个纯函数，接收当前状态和一个描述状态变化的动作，返回新的状态。
+2. **initialState**：初始状态。
+3. **init**（可选）：一个惰性初始化函数，用于计算初始状态。
 
-4. the goal of this reducer function is to return an updated state object and action object, and this action object will tell this function how to update this state。
+`useReducer` 返回一个包含当前状态和 `dispatch` 函数的数组。`dispatch` 函数用于分发动作，触发状态更新。
 
-5. it is quite common to receive an object as a value for action, the object also has a ' type ' property.
+### 示例代码
 
-6. and the idea simply is that we can take a look at this type, which is part of the incoming action, and then run different code for different action types
+以下是一个使用 `useReducer` 的示例，展示如何管理复杂的状态逻辑：
 
-7. In the component function when we call useReducer that define how the state should be look like. because you use useReducer by passing your reducer function as a first parameter, you are not calling it, instead you are just passing a pointer at this function to useReducer, and then we pass the initial state value. so the state that should be assumed when this component renders for the first time.
+#### 定义 `reducer` 函数
 
-   ```
-   //一个状态参数，一个动作参数
-   function cartReducer(state,action) {
-   // 处理不同的操作，用来更新不同的状态
-     if(action.type === 'ADD_ITEM') {
-     	//...update the state do add a meal item
-     	const existingCartItemIndex = state.items.findIndex({
-     		(item) => item.id === action.item.id
-     	});
-     	   updatedItems == [...state.items];
-     	if(existingCartItemIndex > -1){//-1表示没有找到,创建新的，不可以push到数组，要shallow copy
-     	    const exsitingItem = state.items[existingCartItemIndex]
-     		const updatedItem = {
-     			...exsitingItem,
-     			quantity: exsitingItem.quantity + 1
-     		}
-     		updatedItems[existingCartItemIndex] = updatedItem
-     		以上也是我们以不可变的方式更新这个状态，所以不需要改变内存中的状态
-     	}else{
-     	    updatedItems.push( {...action.item, quantity:1 })
-     	   //添加item的时候，创建一个新的对象。
-     	}
-       return {...state, items: updatedItems};
-     }
-     if(action.type === 'REMOVE_ITEM') {
-     	//...remove
-       
-       an item from the state
-     }
-     
-     return state;
-   }
-   ```
+```javascript
+const initialState = { count: 0 };
 
-   
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return { count: state.count + 1 };
+    case 'decrement':
+      return { count: state.count - 1 };
+    case 'reset':
+      return initialState;
+    default:
+      throw new Error();
+  }
+}
+```
+
+#### 使用 `useReducer` 在组件中管理状态
+
+```javascript
+import React, { useReducer } from 'react';
+
+const Counter = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  return (
+    <div>
+      <p>Count: {state.count}</p>
+      <button onClick={() => dispatch({ type: 'increment' })}>Increment</button>
+      <button onClick={() => dispatch({ type: 'decrement' })}>Decrement</button>
+      <button onClick={() => dispatch({ type: 'reset' })}>Reset</button>
+    </div>
+  );
+};
+
+export default Counter;
+```
+
+### 解释
+
+1. **定义 `reducer` 函数**：
+   - `reducer` 函数接收当前状态 `state` 和一个动作 `action`，根据动作的类型返回新的状态。
+   - 在这个示例中，`reducer` 函数处理三种动作类型：`increment`、`decrement` 和 `reset`。
+
+2. **使用 `useReducer`**：
+   - `const [state, dispatch] = useReducer(reducer, initialState);`
+   - `useReducer` 返回当前状态 `state` 和一个 `dispatch` 函数。
+   - `dispatch` 函数用于分发动作，触发状态更新。
+
+3. **在组件中使用 `dispatch`**：
+   - 在按钮的 `onClick` 事件中调用 `dispatch` 函数，分发不同的动作。
+   - 例如，点击 "Increment" 按钮时，分发 `{ type: 'increment' }` 动作，触发状态更新。
+
+### 适用场景
+
+`useReducer` 适用于以下场景：
+- 状态逻辑复杂且包含多个子值。
+- 状态更新逻辑依赖于先前的状态。
+- 需要在不同组件之间共享状态更新逻辑。
+
+### 总结
+
+`useReducer` 是 React 提供的一个 Hook，用于在函数组件中管理复杂的状态逻辑。它通过 `reducer` 函数和 `dispatch` 函数提供了一种清晰的方式来处理状态更新，适用于包含多个子值或需要依赖于先前状态的状态更新逻辑。
+
+
 
 # Redux /rɪˈdʌks/
 
@@ -818,7 +863,7 @@ useReducer, 其实就是一个state减法器，是一个更通用和灵活的状
 
 - **依赖项未发生变化**：如果 `useCallback` 返回的函数的依赖项在重新加载时没有发生变化，那么它会继续返回相同的函数引用。如果依赖项 `dependency1` 或 `dependency2` 在重新渲染时不发生变化，`memoizedCallback` 函数的引用将保持不变，即使组件重新渲染，函数引用也不会改变。
 
-- **依赖项发生变化**：如果依赖项发生了变化，`useCallback` 将返回一个新的函数引用。这样就可以优化代码，减少内存的引用。
+- **依赖项发生变化**：如果依赖项发生了变化，`useCallback` 将返回一个新的函数引用。否则，它会返回缓存的回调函数实例，这样就可以优化代码，减少内存的引用。
 
   ```
   const memoizedCallback = useCallback(
